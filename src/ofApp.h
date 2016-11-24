@@ -19,20 +19,24 @@ public:
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
 
-  void importForegrounds();
-  void importBackgrounds();
+  void importTargets();
+  void importAndroidBackgrounds();
+  void importSnsBackgrounds();
   void exportPhotos();
 
-  bool isUpdated          = false;
-  bool isBackgroundLoaded = false;
-  bool isForegroundLoaded = false;
+  bool isTargetLoaded = false;
+  bool isAndroidBackgroundLoaded = false;
+  bool isSnsBackgroundLoaded = false;
+  float windowAspectRatio = (640 + 1440) / 1395.0;
+  float widthRatio        = 640 / 1440.0;
   int currentFrame        = 0;
 
   int exportMovieFramerate = 10;
   int exportMovieSeconds   = 3;
 
-  vector<ofImage> foregroundImages;
-  vector<ofImage> backgroundImages;
+  vector<ofImage> targetImages;
+  vector<ofImage> androidBackgroundImages;
+  vector<ofImage> snsBackgroundImages;
   ofImage exportImage;
 
   ofxChromaKey chromaKey;
