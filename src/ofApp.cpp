@@ -8,7 +8,9 @@ void ofApp::setup()
   gui = new ofxDatGui(ofxDatGuiAnchor::TOP_LEFT);
 
   chromaKey.threshold = 0.1;
-  fbo.allocate(1440, 1395, GL_RGBA);
+  fbo_android.allocate(1440, 1395, GL_RGBA);
+  fbo_sns.allocate(640, 640);
+  fbo_web.allocate(640, 640);
 }
 
 void ofApp::update()
@@ -17,17 +19,24 @@ void ofApp::update()
 
 void ofApp::draw()
 {
-  // TOP LEFT
+  // LEFT TOP:      PREVIEW
   if (isTargetLoaded) {
-    targetImages[currentFrame].draw(0, 0, ofGetWidth() * widthRatio, ofGetHeight() / 2);
+    targetImages[currentFrame].draw(0, 0, ofGetWidth() * widthRatio, ofGetWidth() * widthRatio);
   }
 
-  // BOTTOM LEFT
+  // LEFT BOTTOM:   GUI
+  ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", 20, ofGetHeight() / 2);  // TODO: Just Debug!
 
-  // RIGHT
-  fbo.begin();
+  // MIDDLE TOP:    WEB
+
+  // MIDDLE BOTTOM: SNS
+  if (isSnsBackgroundLoaded) {
+  }
+
+  // RIGHT:         ANDROID
+  fbo_android.begin();
   ofSetColor(0);
-  ofDrawRectangle(0, 0, fbo.getWidth(), fbo.getHeight());
+  ofDrawRectangle(0, 0, fbo_android.getWidth(), fbo_android.getHeight());
   ofSetColor(255);
   if (isAndroidBackgroundLoaded) {
     androidBackgroundImages[currentFrame].draw(0, 0);
@@ -37,10 +46,8 @@ void ofApp::draw()
     targetImages[currentFrame].draw(1440 / 2 - 640 / 2, 651 + 93);
     chromaKey.end();
   }
-  fbo.end();
-  fbo.draw(ofGetWidth() * widthRatio, 0, ofGetWidth() * (1 - widthRatio), ofGetHeight());
-
-  ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", 20, ofGetHeight() / 2);  // TODO: Just Debug!
+  fbo_android.end();
+  fbo_android.draw(ofGetWidth() * widthRatio, 0, ofGetWidth() * (1 - widthRatio), ofGetHeight());
 }
 
 void ofApp::keyPressed(int key)
@@ -58,7 +65,7 @@ void ofApp::keyPressed(int key)
       importAndroidBackgrounds();
       break;
     case 'e':
-      exportPhotos();
+      exportForAndroid();
       break;
     case OF_KEY_UP:
       chromaKey.threshold += 0.005;
@@ -115,7 +122,6 @@ void ofApp::importTargets()
   foregroundDirectory.listDir();
   targetImages.clear();
   for (ofFile f : foregroundDirectory.getFiles()) {
-    ofLog() << f.getAbsolutePath(); // TODO: Just Debug!
     ofImage importing;
     importing.load(f.getAbsolutePath());
     targetImages.push_back(importing);
@@ -131,7 +137,6 @@ void ofApp::importAndroidBackgrounds()
   androidBackgroundDirectory.listDir();
   androidBackgroundImages.clear();
   for (ofFile f : androidBackgroundDirectory.getFiles()) {
-    ofLog() << f.getAbsolutePath(); // TODO: Just Debug!
     ofImage importing;
     importing.load(f.getAbsolutePath());
     androidBackgroundImages.push_back(importing);
@@ -146,7 +151,6 @@ void ofApp::importSnsBackgrounds()
   snsBackgroundDirectory.listDir();
   snsBackgroundImages.clear();
   for (ofFile f : snsBackgroundDirectory.getFiles()) {
-    ofLog() << f.getAbsolutePath(); // TODO: Just Debug!
     ofImage importing;
     importing.load(f.getAbsolutePath());
     snsBackgroundImages.push_back(importing);
@@ -154,11 +158,28 @@ void ofApp::importSnsBackgrounds()
   isSnsBackgroundLoaded = true;
 }
 
-void ofApp::exportPhotos()
+void ofApp::exportForAndroid()
 {
   ofDirectory exportDirectory("/Users/suzuki/Desktop/NinaRicci/export");
   ofPixels    pixels;
-  fbo.readToPixels(pixels);
-  exportImage.setFromPixels(pixels);
-  exportImage.save(exportDirectory.getAbsolutePath() + "/" + ofToString(currentFrame) + ".png", OF_IMAGE_QUALITY_BEST);
+  fbo_android.readToPixels(pixels);
+  exportAndroidImage.setFromPixels(pixels);
+  exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+}
+
+void ofApp::exportForSns()
+{
+  ofDirectory exportDirectory("/Users/suzuki/Desktop/NinaRicci/export");
+  ofPixels    pixels;
+  fbo_sns.readToPixels(pixels);
+  exportSnsImage.setFromPixels(pixels);
+  exportSnsImage.save(exportDirectory.getAbsolutePath() + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+}
+
+void ofApp::exportForWeb() {
+  ofDirectory exportDirectory("/Users/suzuki/Desktop/NinaRicci/export");
+  ofPixels    pixels;
+  fbo_web.readToPixels(pixels);
+  exportWebImage.setFromPixels(pixels);
+  exportWebImage.save(exportDirectory.getAbsolutePath() + "/web.png", OF_IMAGE_QUALITY_BEST);
 }

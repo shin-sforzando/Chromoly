@@ -22,24 +22,31 @@ public:
   void importTargets();
   void importAndroidBackgrounds();
   void importSnsBackgrounds();
-  void exportPhotos();
+  void exportForAndroid();
+  void exportForSns();
+  void exportForWeb();
 
-  bool isTargetLoaded = false;
+  bool isTargetLoaded            = false;
   bool isAndroidBackgroundLoaded = false;
-  bool isSnsBackgroundLoaded = false;
-  float windowAspectRatio = (640 + 1440) / 1395.0;
-  float widthRatio        = 640 / 1440.0;
-  int currentFrame        = 0;
+  bool isSnsBackgroundLoaded     = false;
+  float windowAspectRatio        = (640 + 1440) / 1395.0;
+  float widthRatio               = 640 / 1440.0;
+  int currentFrame               = 0;
 
   int exportMovieFramerate = 10;
   int exportMovieSeconds   = 3;
 
-  vector<ofImage> targetImages;
-  vector<ofImage> androidBackgroundImages;
-  vector<ofImage> snsBackgroundImages;
-  ofImage exportImage;
+  vector <ofImage> targetImages;
+  vector <ofImage> androidBackgroundImages;
+  vector <ofImage> snsBackgroundImages;
+  ofImage webBackgroundImage;
+  ofImage exportAndroidImage;
+  ofImage exportSnsImage;
+  ofImage exportWebImage;
 
   ofxChromaKey chromaKey;
   ofxDatGui *gui;
-  ofFbo fbo;
+  ofFbo fbo_android;
+  ofFbo fbo_sns;
+  ofFbo fbo_web;
 };
