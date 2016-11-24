@@ -42,6 +42,7 @@ public:
   bool isAndroidBackgroundLoaded = false;
   bool isSnsBackgroundLoaded     = false;
   bool isWebBackgroundLoaded     = false;
+  bool isExporting = false;
 
   float desirableWidth    = 1.0 * (TARGET_WIDTH + WEB_WIDTH + ANDROID_WIDTH);
   float desirableHeight   = 1.0 * ANDROID_HEIGHT;
@@ -50,6 +51,11 @@ public:
   float middlePaneRatio   = WEB_WIDTH / desirableWidth;
   float rightPaneRatio    = ANDROID_WIDTH / desirableWidth;
   int currentFrame        = 0;
+  
+  float overlayScale = 0.6;
+  int overlayX = 0;
+  int overlayY = 0;
+  int captureFrame = 0;
 
   int exportMovieFramerate = 10;
   int exportMovieSeconds   = 3;
@@ -66,8 +72,13 @@ public:
 
   ofxDatGui *gui;
   ofxDatGuiSlider *sliderCurrentFrame;
+  ofxDatGuiFolder *folderChromakey;
   ofxDatGuiColorPicker *colorPicker;
   ofxDatGuiSlider *sliderThreshold;
+  ofxDatGuiFolder *folderOverlay;
+  ofxDatGuiSlider *sliderScale;
+  ofxDatGuiSlider *sliderX;
+  ofxDatGuiSlider *sliderY;
 
   ofFbo fbo_android;
   ofFbo fbo_sns;

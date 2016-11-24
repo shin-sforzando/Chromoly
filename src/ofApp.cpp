@@ -9,14 +9,26 @@ void ofApp::setup()
   gui = new ofxDatGui(0, 0);
   gui->setTheme(new ofxDatGuiCustomFontSize);
   gui->addFRM();
-  sliderCurrentFrame = gui->addSlider("Current Frame", 0, 30, 0);
+  sliderCurrentFrame = gui->addSlider("Current Frame", 0.0, 30.0, 0.0);
   sliderCurrentFrame->setPrecision(0);
   sliderCurrentFrame->bind(currentFrame);
-  colorPicker = gui->addColorPicker("Key Color");
+  folderChromakey = gui->addFolder("Chroma Key");
+  colorPicker     = folderChromakey->addColorPicker("Key Color");
   colorPicker->onColorPickerEvent(this, &ofApp::onColorPickerEvent);
-  sliderThreshold = gui->addSlider("Threshold", 0, 1.0, 0.1);
+  sliderThreshold = folderChromakey->addSlider("Threshold", 0, 1.0, 0.1);
   sliderThreshold->setPrecision(3);
   sliderThreshold->bind(chromaKey.threshold);
+  folderChromakey->expand();
+  folderOverlay = gui->addFolder("Overlay");
+  sliderScale   = folderOverlay->addSlider("Scale", 0.0, 1.0);
+  sliderScale->bind(overlayScale);
+  sliderX = folderOverlay->addSlider("X", 0.0, SNS_WIDTH);
+  sliderX->setPrecision(0);
+  sliderX->bind(overlayX);
+  sliderY = folderOverlay->addSlider("Y", 0.0, SNS_HEIGHT);
+  sliderY->setPrecision(0);
+  sliderY->bind(overlayY);
+  folderOverlay->expand();
   ofApp::windowResized(1400, 718);
 
   fbo_android.allocate(ANDROID_WIDTH, ANDROID_HEIGHT);
@@ -43,13 +55,37 @@ void ofApp::draw()
   // LEFT BOTTOM:   GUI
 
   // MIDDLE TOP:    WEB
+  fbo_web.begin();
+  ofClear(0);
   if (isWebBackgroundLoaded) {
-    webBackgroundImage.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
+    webBackgroundImage.draw(0, 0);
+  }
+  if (isTargetLoaded) {
+    chromaKey.begin();
+    targetImages[captureFrame].draw(overlayX, overlayY, WEB_WIDTH * overlayScale, WEB_HEIGHT * overlayScale);
+    chromaKey.end();
+  }
+  fbo_web.end();
+  fbo_web.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
+  if (isExporting) {
+    ofApp::exportForWeb();
   }
 
   // MIDDLE BOTTOM: SNS
+  fbo_sns.begin();
+  ofClear(0);
   if (isSnsBackgroundLoaded) {
-    snsBackgroundImages[currentFrame].draw(ofGetWidth() * leftPaneRatio, ofGetHeight() / 2, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
+    snsBackgroundImages[currentFrame].draw(0, 0);
+  }
+  if (isTargetLoaded) {
+    chromaKey.begin();
+    targetImages[currentFrame].draw(overlayX, overlayY, SNS_WIDTH * overlayScale, SNS_HEIGHT * overlayScale);
+    chromaKey.end();
+  }
+  fbo_sns.end();
+  fbo_sns.draw(ofGetWidth() * leftPaneRatio, ofGetHeight() / 2, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
+  if (isExporting) {
+    ofApp::exportForSns();
   }
 
   // RIGHT:         ANDROID
@@ -70,6 +106,16 @@ void ofApp::draw()
   }
   fbo_android.end();
   fbo_android.draw(ofGetWidth() * (1 - rightPaneRatio), 0, ofGetWidth() * rightPaneRatio, ofGetHeight());
+  if (isExporting) {
+    ofApp::exportForAndroid();
+  }
+
+  if (isTargetLoaded && currentFrame + 1 < targetImages.size() - 1) {
+    currentFrame++;
+  } else {
+    currentFrame = 0;
+    isExporting  = false;
+  }
 }
 
 void ofApp::keyPressed(int key)
@@ -98,9 +144,8 @@ void ofApp::keyPressed(int key)
       importWebBackground();
       break;
     case 'e':
-      exportForAndroid();
-      exportForSns();
-      exportForWeb();
+      isExporting  = true;
+      currentFrame = 0;
       break;
     case OF_KEY_UP:
       chromaKey.threshold += 0.005;
@@ -145,7 +190,7 @@ void ofApp::mousePressed(int x, int y, int button)
 
 void ofApp::mouseReleased(int x, int y, int button)
 {
-  if(button == 2) {
+  if (button == 2) {
     // Right Click
     if (isTargetLoaded && x < ofGetWidth() * leftPaneRatio && y < ofGetWidth() * leftPaneRatio) {
       // Inside RAW Area
@@ -172,7 +217,8 @@ void ofApp::gotMessage(ofMessage msg)
 {
 }
 
-void ofApp::onColorPickerEvent(ofxDatGuiColorPickerEvent e){
+void ofApp::onColorPickerEvent(ofxDatGuiColorPickerEvent e)
+{
   chromaKey.keyColor = e.color;
 }
 
@@ -190,7 +236,7 @@ void ofApp::importTargets()
   chromaKey.keyColor = targetImages[0].getColor(0, 0);
   colorPicker->setColor(chromaKey.keyColor);
   sliderCurrentFrame->setMax(targetImages.size() - 1);
-  isTargetLoaded     = true;
+  isTargetLoaded = true;
 }
 
 void ofApp::importAndroidBackgrounds()
