@@ -32,7 +32,7 @@ Table of Contents
 ## Requirements
 - Mac OS 10.11 or higher
 - Xcode 8.1 or higher
-- [openFrameworks](http://openframeworks.cc) 0.97 or higher
+- [openFrameworks](http://openframeworks.cc) 0.98 or higher
 - [Homebrew](http://brew.sh)
     - [ImageMagick](http://www.imagemagick.org/)
     - [QREncode](http://fukuchi.org/works/qrencode/)
