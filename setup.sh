@@ -23,5 +23,8 @@ cd $WORKING_DIR
 ## Install ImageMagick
 brew install imagemagick
 
+## Install ffmpeg
+brew install ffmpeg
+
 ## Install QREncode
 brew install qrencode

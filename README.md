@@ -38,6 +38,7 @@ Table of Contents
 - [openFrameworks](http://openframeworks.cc) 0.98 or higher
 - [Homebrew](http://brew.sh)
     - [ImageMagick](http://www.imagemagick.org/)
+    - [FFmpeg](https://www.ffmpeg.org)
     - [QREncode](http://fukuchi.org/works/qrencode/)
 
 ## How to Setup
@@ -72,7 +73,9 @@ Table of Contents
 * Take continuous photos more than final movie rate
 
 ## How to Use
-(T.B.D.)
+
+### Make mp4
+`ffmpeg -r 10 -i android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" android_yuv420p.mp4`
 
 ## Contributes
 - Shin'ichiro SUZUKI
