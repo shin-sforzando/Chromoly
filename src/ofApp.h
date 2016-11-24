@@ -23,14 +23,16 @@ public:
   void importBackgrounds();
   void exportPhotos();
 
-  bool isUpdated   = true;
-  int currentFrame = 0;
+  bool isUpdated          = false;
+  bool isBackgroundLoaded = false;
+  bool isForegroundLoaded = false;
+  int currentFrame        = 0;
 
   int exportMovieFramerate = 10;
   int exportMovieSeconds   = 3;
 
-  vector <ofImage> foregroundImages;
-  vector <ofImage> backgroundImages;
+  vector<ofImage> foregroundImages;
+  vector<ofImage> backgroundImages;
   ofImage exportImage;
 
   ofxChromaKey chromaKey;
