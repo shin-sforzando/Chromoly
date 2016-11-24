@@ -5,6 +5,15 @@
 #include "ofxDatGui.h"
 #include "ofxXmlSettings.h"
 
+#define TARGET_WIDTH   640
+#define TARGET_HEIGHT  640
+#define ANDROID_WIDTH  1440
+#define ANDROID_HEIGHT 1395
+#define SNS_WIDTH      640
+#define SNS_HEIGHT     640
+#define WEB_WIDTH      640
+#define WEB_HEIGHT     640
+
 class ofApp : public ofBaseApp {
 public:
   void setup();
@@ -22,6 +31,7 @@ public:
   void importTargets();
   void importAndroidBackgrounds();
   void importSnsBackgrounds();
+  void importWebBackground();
   void exportForAndroid();
   void exportForSns();
   void exportForWeb();
@@ -29,9 +39,15 @@ public:
   bool isTargetLoaded            = false;
   bool isAndroidBackgroundLoaded = false;
   bool isSnsBackgroundLoaded     = false;
-  float windowAspectRatio        = (640 + 1440) / 1395.0;
-  float widthRatio               = 640 / 1440.0;
-  int currentFrame               = 0;
+  bool isWebBackgroundLoaded     = false;
+
+  float desirableWidth    = 1.0 * (TARGET_WIDTH + WEB_WIDTH + ANDROID_WIDTH);
+  float desirableHeight   = 1.0 * ANDROID_HEIGHT;
+  float windowAspectRatio = desirableWidth / desirableHeight;
+  float leftPaneRatio     = TARGET_WIDTH / desirableWidth;
+  float middlePaneRatio   = WEB_WIDTH / desirableWidth;
+  float rightPaneRatio    = ANDROID_WIDTH / desirableWidth;
+  int currentFrame        = 0;
 
   int exportMovieFramerate = 10;
   int exportMovieSeconds   = 3;
