@@ -19,15 +19,18 @@ public:
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
 
-  void importPhotos();
+  void importForegrounds();
+  void importBackgrounds();
   void exportPhotos();
 
-  bool isUpdated = true;
-  int exportMovieFramerate = 10;
-  int exportMovieSeconds = 3;
+  bool isUpdated   = true;
+  int currentFrame = 0;
 
-  ofImage foregroundImages[30];  // TODO: It's makeshift variable.
-  ofImage backgroundImages;
+  int exportMovieFramerate = 10;
+  int exportMovieSeconds   = 3;
+
+  vector <ofImage> foregroundImages;
+  vector <ofImage> backgroundImages;
   ofImage exportImage;
 
   ofxChromaKey chromaKey;

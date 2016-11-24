@@ -18,7 +18,10 @@ Table of Contents
 			- [2.2 Post process](#22-post-process)
 				- [2.2.1 QR code](#221-qr-code)
 				- [2.2.2 Upload](#222-upload)
-		- [3. Camera Utility](#3-camera-utility)
+		- [3. Camera Utility (Canon)](#3-camera-utility-canon)
+			- [3.1 Resolution](#31-resolution)
+			- [3.2 Export setting](#32-export-setting)
+			- [3.3 Shooting](#33-shooting)
 	- [How to Use](#how-to-use)
 	- [Contributes](#contributes)
 	- [ToDo](#todo)
@@ -82,6 +85,7 @@ Table of Contents
 
 ### Low / XXX
 - [ ] Change Icon
+- [ ] Measure import filename's overflow
 - [ ] Implement Sound Notification
 
 ## Misc.
