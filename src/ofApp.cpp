@@ -6,12 +6,22 @@ void ofApp::setup()
   ofSetVerticalSync(true);
   ofEnableAlphaBlending();
 
-  gui = new ofxDatGui(ofxDatGuiAnchor::TOP_LEFT);
+  gui = new ofxDatGui(0, 0);
+  gui->setTheme(new ofxDatGuiCustomFontSize);
+  gui->addFRM();
+  sliderCurrentFrame = gui->addSlider("Current Frame", 0, 30, 0);
+  sliderCurrentFrame->setPrecision(0);
+  sliderCurrentFrame->bind(currentFrame);
+  colorPicker = gui->addColorPicker("Key Color");
+  colorPicker->onColorPickerEvent(this, &ofApp::onColorPickerEvent);
+  sliderThreshold = gui->addSlider("Threshold", 0, 1.0, 0.1);
+  sliderThreshold->setPrecision(3);
+  sliderThreshold->bind(chromaKey.threshold);
+  ofApp::windowResized(1400, 718);
 
-  chromaKey.threshold = 0.1;
-  fbo_android.allocate(1440, 1395);
-  fbo_sns.allocate(640, 640);
-  fbo_web.allocate(640, 640);
+  fbo_android.allocate(ANDROID_WIDTH, ANDROID_HEIGHT);
+  fbo_sns.allocate(SNS_WIDTH, SNS_HEIGHT);
+  fbo_web.allocate(WEB_WIDTH, WEB_HEIGHT);
 }
 
 void ofApp::update()
@@ -20,14 +30,17 @@ void ofApp::update()
 
 void ofApp::draw()
 {
-  // LEFT TOP:      PREVIEW
+  //  +-----+-----+---------+
+  //  | RAW | WEB |         |
+  //  +-----+-----+ ANDROID +
+  //  | GUI | SNS |         |
+  //  +-----+-----+---------+
+  // LEFT TOP:      RAW
   if (isTargetLoaded) {
     targetImages[currentFrame].draw(0, 0, ofGetWidth() * leftPaneRatio, ofGetWidth() * leftPaneRatio);
   }
 
   // LEFT BOTTOM:   GUI
-  ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", 36, ofGetHeight() / 2);  // TODO: Just Debug!
-  ofDrawBitmapString(ofToString(currentFrame, 3, '0'), 36, ofGetHeight() / 2 + 50);  // TODO: Just Debug!
 
   // MIDDLE TOP:    WEB
   if (isWebBackgroundLoaded) {
@@ -132,11 +145,23 @@ void ofApp::mousePressed(int x, int y, int button)
 
 void ofApp::mouseReleased(int x, int y, int button)
 {
+  if(button == 2) {
+    // Right Click
+    if (isTargetLoaded && x < ofGetWidth() * leftPaneRatio && y < ofGetWidth() * leftPaneRatio) {
+      // Inside RAW Area
+      int actualX = x * (1.0 * desirableWidth / ofGetWidth());
+      int actualY = y * (1.0 * desirableHeight / ofGetHeight());
+      chromaKey.keyColor = targetImages[currentFrame].getColor(actualX, actualY);
+      colorPicker->setColor(chromaKey.keyColor);
+    }
+  }
 }
 
 void ofApp::windowResized(int w, int h)
 {
   ofSetWindowShape(ofGetHeight() * windowAspectRatio, ofGetHeight());
+  gui->setPosition(0, ofGetHeight() / 2);
+  gui->setWidth(ofGetWidth() * leftPaneRatio);
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo)
@@ -147,24 +172,30 @@ void ofApp::gotMessage(ofMessage msg)
 {
 }
 
+void ofApp::onColorPickerEvent(ofxDatGuiColorPickerEvent e){
+  chromaKey.keyColor = e.color;
+}
+
 void ofApp::importTargets()
 {
-  ofDirectory foregroundDirectory("/Users/suzuki/Desktop/NinaRicci/import");
-  foregroundDirectory.allowExt("jpg");
-  foregroundDirectory.listDir();
+  ofDirectory targetDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/import");
+  targetDirectory.allowExt("jpg");
+  targetDirectory.listDir();
   targetImages.clear();
-  for (ofFile f : foregroundDirectory.getFiles()) {
+  for (ofFile f : targetDirectory.getFiles()) {
     ofImage importing;
     importing.load(f.getAbsolutePath());
     targetImages.push_back(importing);
   }
   chromaKey.keyColor = targetImages[0].getColor(0, 0);
+  colorPicker->setColor(chromaKey.keyColor);
+  sliderCurrentFrame->setMax(targetImages.size() - 1);
   isTargetLoaded     = true;
 }
 
 void ofApp::importAndroidBackgrounds()
 {
-  ofDirectory androidBackgroundDirectory("/Users/suzuki/Desktop/NinaRicci/background_android");
+  ofDirectory androidBackgroundDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_android");
   androidBackgroundDirectory.allowExt("jpg");
   androidBackgroundDirectory.listDir();
   androidBackgroundImages.clear();
@@ -178,7 +209,7 @@ void ofApp::importAndroidBackgrounds()
 
 void ofApp::importSnsBackgrounds()
 {
-  ofDirectory snsBackgroundDirectory("/Users/suzuki/Desktop/NinaRicci/background_sns");
+  ofDirectory snsBackgroundDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_sns");
   snsBackgroundDirectory.allowExt("jpg");
   snsBackgroundDirectory.listDir();
   snsBackgroundImages.clear();
@@ -192,13 +223,13 @@ void ofApp::importSnsBackgrounds()
 
 void ofApp::importWebBackground()
 {
-  webBackgroundImage.load("/Users/suzuki/Desktop/NinaRicci/background_web/web.png");
+  webBackgroundImage.load(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_web/web.png");
   isWebBackgroundLoaded = true;
 }
 
 void ofApp::exportForAndroid()
 {
-  ofDirectory exportDirectory("/Users/suzuki/Desktop/NinaRicci/export");
+  ofDirectory exportDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/export");
   ofPixels    pixels;
   fbo_android.readToPixels(pixels);
   exportAndroidImage.setFromPixels(pixels);
@@ -207,7 +238,7 @@ void ofApp::exportForAndroid()
 
 void ofApp::exportForSns()
 {
-  ofDirectory exportDirectory("/Users/suzuki/Desktop/NinaRicci/export");
+  ofDirectory exportDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/export");
   ofPixels    pixels;
   fbo_sns.readToPixels(pixels);
   exportSnsImage.setFromPixels(pixels);
@@ -216,7 +247,7 @@ void ofApp::exportForSns()
 
 void ofApp::exportForWeb()
 {
-  ofDirectory exportDirectory("/Users/suzuki/Desktop/NinaRicci/export");
+  ofDirectory exportDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/export");
   ofPixels    pixels;
   fbo_web.readToPixels(pixels);
   exportWebImage.setFromPixels(pixels);

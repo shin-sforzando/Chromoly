@@ -3,7 +3,7 @@ Chromoly
 
 Package for chroma key compositing with oF.
 
-![Screenshot](https://dummyimage.com/480x640/000/fff.png)
+![Screenshot](https://dummyimage.com/700x359/000/fff.png)
 
 Table of Contents
 --------

@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxChromaKey.h"
 #include "ofxDatGui.h"
+#include "ofxDatGuiCustomFontSize.h"
 #include "ofxXmlSettings.h"
 
 #define TARGET_WIDTH   640
@@ -28,6 +29,7 @@ public:
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
 
+  void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
   void importTargets();
   void importAndroidBackgrounds();
   void importSnsBackgrounds();
@@ -61,7 +63,12 @@ public:
   ofImage exportWebImage;
 
   ofxChromaKey chromaKey;
+
   ofxDatGui *gui;
+  ofxDatGuiSlider *sliderCurrentFrame;
+  ofxDatGuiColorPicker *colorPicker;
+  ofxDatGuiSlider *sliderThreshold;
+
   ofFbo fbo_android;
   ofFbo fbo_sns;
   ofFbo fbo_web;
