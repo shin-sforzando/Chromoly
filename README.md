@@ -5,32 +5,33 @@ Package for chroma key compositing with oF.
 
 ![Screenshot](screenshot.png)
 
+    +-----+-----+---------+
+    | RAW | WEB |         |
+    +-----+-----+ ANDROID +
+    | GUI | SNS |         |
+    +-----+-----+---------+
+
 Table of Contents
 --------
 
-<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
-
-	- [Requirements](#requirements)
-	- [How to Setup](#how-to-setup)
-		- [1. openFrameworks](#1-openframeworks)
-		- [2. Automator](#2-automator)
-			- [2.1 Pre process](#21-pre-process)
-			- [2.2 Post process](#22-post-process)
-				- [2.2.1 QR code](#221-qr-code)
-				- [2.2.2 Upload](#222-upload)
-		- [3. Camera Utility (Canon)](#3-camera-utility-canon)
-			- [3.1 Resolution](#31-resolution)
-			- [3.2 Export setting](#32-export-setting)
-			- [3.3 Shooting](#33-shooting)
-	- [How to Use](#how-to-use)
-	- [Contributes](#contributes)
-	- [ToDo](#todo)
-		- [High / FIXME](#high-fixme)
-		- [Mid / TODO](#mid-todo)
-		- [Low / XXX](#low-xxx)
-	- [Misc.](#misc)
-
-<!-- /TOC -->
+- [Requirements](#requirements)
+- [How to Setup](#how-to-setup)
+	- [1. openFrameworks](#1-openframeworks)
+	- [2. Automator](#2-automator)
+		- [2.1 Pre process](#21-pre-process)
+			- [2.1.1 Resize](#211-resize)
+		- [2.2 Post process](#22-post-process)
+			- [2.2.1 Convert to mp4](#221-convert-to-mp4)
+			- [2.2.2 Upload to AWS S3](#222-upload-to-aws-s3)
+			- [2.2.3 Print QR code](#223-print-qr-code)
+	- [3. Camera Utility (Canon)](#3-camera-utility-canon)
+		- [3.1 Resolution](#31-resolution)
+		- [3.2 Export setting](#32-export-setting)
+		- [3.3 Shooting](#33-shooting)
+- [How to Use](#how-to-use)
+  - [Keyboard shortcut](#keyboard-shortcut)
+  - [Option](#option)
+- [Contributes](#contributes)
 
 ## Requirements
 - Mac OS 10.11 or higher
@@ -52,18 +53,22 @@ Table of Contents
 
 #### 2.1 Pre process
 
+##### 2.1.1 Resize
+
 #### 2.2 Post process
 
-##### 2.2.1 QR code
+##### 2.2.1 Convert to mp4
+`ffmpeg -r 10 -i android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" android_yuv420p.mp4`
 
-##### 2.2.2 Upload
+##### 2.2.2 Upload to AWS S3
+
+##### 2.2.3 Print QR code
 
 ### 3. Camera Utility (Canon)
 
 #### 3.1 Resolution
-* Don't need RAW
-* Set "S1 fine" to approx 3K x 2K
-    - In case of EOS Kiss, it could be 2592 x 1728
+* It doesn't need RAW files
+* Set "S2" to approx 2K x 2K
 
 #### 3.2 Export setting
 * Set import direcotory correctry like "import"
@@ -74,18 +79,35 @@ Table of Contents
 
 ## How to Use
 
-### Make mp4
-`ffmpeg -r 10 -i android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" android_yuv420p.mp4`
+1. Push "Reload" button to target images
+1. Choose chroma key color
+    * Use color picker
+    * Right click inside TOP-LEFT area
+1. Adjust chromakey threshold
+    * Use slider
+    * Use UP / DOWN key
+1. Adjust frame number, scale and position for WEB
+    * User slider or LEFT / RIGHT key to choose the frame number which will be WEB image
+    * Use slider to adjust scale
+    * Use 2D pad to adjust position
+1. Adjust scale and position for SNS
+    * Use slider to adjust scale
+    * Use 2D pad to adjust position
+1. Push "Export" button to export synthesized images
+
+### Keyboard shortcut
+
+- b
+    - Reload **B**ackground images
+- l / r / t
+    - **R**e**L**oad **T**arget images
+- e
+    - **E**xport synthesized images
+
+### Option
+* You can change preview framerate
+    * User slider
+    * If it was set '0', Chromoly will try to render as quick as possible
 
 ## Contributes
-- Shin'ichiro SUZUKI
-
-## ToDo
-
-### High / FIXME
-
-### Mid / TODO
-
-### Low / XXX
-
-## Misc.
+- Shin'ichiro SUZUKI (CEO / [szk-engineering](https://szk-engineering.com/))

@@ -19,6 +19,7 @@ void ofApp::setup()
   buttonReload = gui->addButton("Reload");
   buttonReload->onButtonEvent(this, &ofApp::onButtonReloadEvent);
   buttonReload->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+  buttonReload->setBorder(ofColor::red, 10);
   sliderCurrentFrame = gui->addSlider("Current Frame", 0.0, 30.0, 0.0);
   sliderCurrentFrame->setPrecision(0);
   sliderCurrentFrame->bind(currentFrame);
@@ -128,6 +129,7 @@ void ofApp::draw()
   }
 
   // LEFT BOTTOM:   GUI
+  // TODO: Notice exporting
 
   // MIDDLE TOP:    WEB
   webCheckerImage.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
@@ -165,6 +167,7 @@ void ofApp::keyPressed(int key)
     case 'i':
     case 'l':
     case 't':
+    case 'r':
       importTargets();
       break;
     case 'w':
