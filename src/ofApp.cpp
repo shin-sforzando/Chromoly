@@ -5,10 +5,14 @@ void ofApp::setup()
   ofSetWindowTitle("Chromoly (NINA RICCI 2016 Version)");
   ofSetVerticalSync(true);
   ofEnableAlphaBlending();
+  ofSetFrameRate(previewMovieFramerate);
 
   gui = new ofxDatGui(0, 0);
   gui->setTheme(new ofxDatGuiCustomFontSize);
   gui->addFRM();
+  buttonReload = gui->addButton("Reload");
+  buttonReload->onButtonEvent(this, &ofApp::onButtonReloadEvent);
+  buttonReload->setLabelAlignment(ofxDatGuiAlignment::CENTER);
   sliderCurrentFrame = gui->addSlider("Current Frame", 0.0, 30.0, 0.0);
   sliderCurrentFrame->setPrecision(0);
   sliderCurrentFrame->bind(currentFrame);
@@ -29,28 +33,28 @@ void ofApp::setup()
   sliderY->setPrecision(0);
   sliderY->bind(overlayY);
   folderOverlay->expand();
+  buttonExport = gui->addButton("Export");
+  buttonExport->onButtonEvent(this, &ofApp::onButtonExportEvent);
+  buttonExport->setLabelAlignment(ofxDatGuiAlignment::CENTER);
   ofApp::windowResized(1400, 718);
 
   fbo_android.allocate(ANDROID_WIDTH, ANDROID_HEIGHT);
   fbo_sns.allocate(SNS_WIDTH, SNS_HEIGHT);
   fbo_web.allocate(WEB_WIDTH, WEB_HEIGHT);
+  
+  importAndroidBackgrounds();
+  importSnsBackgrounds();
+  importWebBackground();
 }
 
+//  +-----+-----+---------+
+//  | RAW | WEB |         |
+//  +-----+-----+ ANDROID +
+//  | GUI | SNS |         |
+//  +-----+-----+---------+
 void ofApp::update()
 {
-}
-
-void ofApp::draw()
-{
-  //  +-----+-----+---------+
-  //  | RAW | WEB |         |
-  //  +-----+-----+ ANDROID +
-  //  | GUI | SNS |         |
-  //  +-----+-----+---------+
   // LEFT TOP:      RAW
-  if (isTargetLoaded) {
-    targetImages[currentFrame].draw(0, 0, ofGetWidth() * leftPaneRatio, ofGetWidth() * leftPaneRatio);
-  }
 
   // LEFT BOTTOM:   GUI
 
@@ -66,10 +70,6 @@ void ofApp::draw()
     chromaKey.end();
   }
   fbo_web.end();
-  fbo_web.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
-  if (isExporting) {
-    ofApp::exportForWeb();
-  }
 
   // MIDDLE BOTTOM: SNS
   fbo_sns.begin();
@@ -83,11 +83,6 @@ void ofApp::draw()
     chromaKey.end();
   }
   fbo_sns.end();
-  fbo_sns.draw(ofGetWidth() * leftPaneRatio, ofGetHeight() / 2, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
-  if (isExporting) {
-    ofApp::exportForSns();
-  }
-
   // RIGHT:         ANDROID
   fbo_android.begin();
   ofSetColor(0);
@@ -105,12 +100,36 @@ void ofApp::draw()
     chromaKey.end();
   }
   fbo_android.end();
+}
+
+void ofApp::draw()
+{
+  // LEFT TOP:      RAW
+  if (isTargetLoaded) {
+    targetImages[currentFrame].draw(0, 0, ofGetWidth() * leftPaneRatio, ofGetWidth() * leftPaneRatio);
+  }
+
+  // LEFT BOTTOM:   GUI
+
+  // MIDDLE TOP:    WEB
+  fbo_web.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
+  if (isExporting) {
+    ofApp::exportForWeb();
+  }
+
+  // MIDDLE BOTTOM: SNS
+    fbo_sns.draw(ofGetWidth() * leftPaneRatio, ofGetHeight() / 2, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
+  if (isExporting) {
+    ofApp::exportForSns();
+  }
+
+  // RIGHT:         ANDROID
   fbo_android.draw(ofGetWidth() * (1 - rightPaneRatio), 0, ofGetWidth() * rightPaneRatio, ofGetHeight());
   if (isExporting) {
     ofApp::exportForAndroid();
   }
 
-  if (isTargetLoaded && currentFrame + 1 < targetImages.size() - 1) {
+  if (isTargetLoaded && currentFrame + 1 < min(targetImages.size() - 1, androidBackgroundImages.size() - 1)) {
     currentFrame++;
   } else {
     currentFrame = 0;
@@ -149,11 +168,9 @@ void ofApp::keyPressed(int key)
       break;
     case OF_KEY_UP:
       chromaKey.threshold += 0.005;
-      ofLog() << chromaKey.threshold;
       break;
     case OF_KEY_DOWN:
       chromaKey.threshold -= 0.005;
-      ofLog() << chromaKey.threshold;
       break;
     case OF_KEY_RIGHT:
       if (isTargetLoaded) {
@@ -217,9 +234,18 @@ void ofApp::gotMessage(ofMessage msg)
 {
 }
 
+void ofApp::onButtonReloadEvent(ofxDatGuiButtonEvent e) {
+  importTargets();
+}
+
 void ofApp::onColorPickerEvent(ofxDatGuiColorPickerEvent e)
 {
   chromaKey.keyColor = e.color;
+}
+
+void ofApp::onButtonExportEvent(ofxDatGuiButtonEvent e) {
+  isExporting  = true;
+  currentFrame = 0;
 }
 
 void ofApp::importTargets()

@@ -29,7 +29,9 @@ public:
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
 
+  void onButtonReloadEvent(ofxDatGuiButtonEvent e);
   void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
+  void onButtonExportEvent(ofxDatGuiButtonEvent e);
   void importTargets();
   void importAndroidBackgrounds();
   void importSnsBackgrounds();
@@ -57,8 +59,7 @@ public:
   int overlayY = 0;
   int captureFrame = 0;
 
-  int exportMovieFramerate = 10;
-  int exportMovieSeconds   = 3;
+  int previewMovieFramerate = 10;
 
   vector <ofImage> targetImages;
   vector <ofImage> androidBackgroundImages;
@@ -71,6 +72,7 @@ public:
   ofxChromaKey chromaKey;
 
   ofxDatGui *gui;
+  ofxDatGuiButton *buttonReload;
   ofxDatGuiSlider *sliderCurrentFrame;
   ofxDatGuiFolder *folderChromakey;
   ofxDatGuiColorPicker *colorPicker;
@@ -79,6 +81,7 @@ public:
   ofxDatGuiSlider *sliderScale;
   ofxDatGuiSlider *sliderX;
   ofxDatGuiSlider *sliderY;
+  ofxDatGuiButton *buttonExport;
 
   ofFbo fbo_android;
   ofFbo fbo_sns;
