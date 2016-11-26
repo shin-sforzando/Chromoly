@@ -29,22 +29,25 @@ public:
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
 
+  void onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e);
   void onButtonReloadEvent(ofxDatGuiButtonEvent e);
   void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
+  void onPadWebPosition(ofxDatGui2dPadEvent e);
+  void onPadSnsPosition(ofxDatGui2dPadEvent e);
   void onButtonExportEvent(ofxDatGuiButtonEvent e);
   void importTargets();
-  void importAndroidBackgrounds();
-  void importSnsBackgrounds();
   void importWebBackground();
-  void exportForAndroid();
-  void exportForSns();
+  void importSnsBackgrounds();
+  void importAndroidBackgrounds();
   void exportForWeb();
+  void exportForSns();
+  void exportForAndroid();
 
   bool isTargetLoaded            = false;
-  bool isAndroidBackgroundLoaded = false;
-  bool isSnsBackgroundLoaded     = false;
   bool isWebBackgroundLoaded     = false;
-  bool isExporting = false;
+  bool isSnsBackgroundLoaded     = false;
+  bool isAndroidBackgroundLoaded = false;
+  bool isExporting               = false;
 
   float desirableWidth    = 1.0 * (TARGET_WIDTH + WEB_WIDTH + ANDROID_WIDTH);
   float desirableHeight   = 1.0 * ANDROID_HEIGHT;
@@ -52,38 +55,47 @@ public:
   float leftPaneRatio     = TARGET_WIDTH / desirableWidth;
   float middlePaneRatio   = WEB_WIDTH / desirableWidth;
   float rightPaneRatio    = ANDROID_WIDTH / desirableWidth;
-  int currentFrame        = 0;
-  
-  float overlayScale = 0.6;
-  int overlayX = 0;
-  int overlayY = 0;
-  int captureFrame = 0;
 
-  int previewMovieFramerate = 10;
+  int previewFramerate = 10;
+  int currentFrame     = 0;
+
+  int webCaptureFrame   = 0;
+  float webOverlayScale = 0.5;
+  int webOverlayX       = WEB_WIDTH / 2;
+  int webOverlayY       = WEB_HEIGHT / 2;
+  float snsOverlayScale = 0.4;
+  int snsOverlayX       = SNS_WIDTH / 2;
+  int snsOverlayY       = SNS_HEIGHT / 2;
+
 
   vector <ofImage> targetImages;
-  vector <ofImage> androidBackgroundImages;
   vector <ofImage> snsBackgroundImages;
+  vector <ofImage> androidBackgroundImages;
   ofImage webBackgroundImage;
-  ofImage exportAndroidImage;
-  ofImage exportSnsImage;
+  ofImage webCheckerImage;
   ofImage exportWebImage;
+  ofImage exportSnsImage;
+  ofImage exportAndroidImage;
 
   ofxChromaKey chromaKey;
 
   ofxDatGui *gui;
+  ofxDatGuiSlider *sliderPreviewFramerate;
   ofxDatGuiButton *buttonReload;
   ofxDatGuiSlider *sliderCurrentFrame;
   ofxDatGuiFolder *folderChromakey;
   ofxDatGuiColorPicker *colorPicker;
   ofxDatGuiSlider *sliderThreshold;
-  ofxDatGuiFolder *folderOverlay;
-  ofxDatGuiSlider *sliderScale;
-  ofxDatGuiSlider *sliderX;
-  ofxDatGuiSlider *sliderY;
+  ofxDatGuiFolder *folderWebOverlay;
+  ofxDatGuiSlider *sliderWebCaptureFrame;
+  ofxDatGuiSlider *sliderWebOverlayScale;
+  ofxDatGui2dPad *padWebPosition;
+  ofxDatGuiFolder *folderSnsOverlay;
+  ofxDatGuiSlider *sliderSnsOverlayScale;
+  ofxDatGui2dPad *padSnsPosition;
   ofxDatGuiButton *buttonExport;
 
-  ofFbo fbo_android;
-  ofFbo fbo_sns;
   ofFbo fbo_web;
+  ofFbo fbo_sns;
+  ofFbo fbo_android;
 };

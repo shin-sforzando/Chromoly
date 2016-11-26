@@ -13,7 +13,8 @@ class ofxDatGuiCustomFontSize: public ofxDatGuiTheme {
 public:
   ofxDatGuiCustomFontSize()
   {
-    font.size = 9;
+    font.size = 10;
+    font.file = "M+2VM+IPAG-circle.ttf";
     layout.upperCaseLabels = false;
     init();
   }

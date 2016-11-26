@@ -3,7 +3,7 @@ Chromoly
 
 Package for chroma key compositing with oF.
 
-![Screenshot](https://dummyimage.com/700x359/000/fff.png)
+![Screenshot](screenshot.png)
 
 Table of Contents
 --------
@@ -87,8 +87,5 @@ Table of Contents
 ### Mid / TODO
 
 ### Low / XXX
-- [ ] Change Icon
-- [ ] Measure import filename's overflow
-- [ ] Implement Sound Notification
 
 ## Misc.
