@@ -63,6 +63,11 @@ Table of Contents
 ##### 2.2.2 Upload to AWS S3
 
 ##### 2.2.3 Print QR code
+`lpr -P Brother_QL-700 -o media=DC17 ~.png`
+
+- DC17 = 39x48mm
+- DC03 = 29x90mm
+- DC08 = 29x42mm
 
 ### 3. Camera Utility (Canon)
 

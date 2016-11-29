@@ -107,16 +107,13 @@ void ofApp::update()
   ofSetColor(0);
   ofDrawRectangle(0, 0, fbo_android.getWidth(), fbo_android.getHeight());
   ofSetColor(255);
-  if (isAndroidBackgroundLoaded) {
-    androidBackgroundImages[currentFrame].draw(0, 0);
-  }
   if (isTargetLoaded) {
-    ofImage flipped;
-    flipped.clone(targetImages[currentFrame]);
-    flipped.mirror(true, false);
     chromaKey.begin();
-    flipped.draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 + 93);
+    targetImages[currentFrame].draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 - TARGET_HEIGHT);
     chromaKey.end();
+  }
+  if (isAndroidBackgroundLoaded) {
+    androidBackgroundImages[currentFrame].draw(0, 651 + 93);
   }
   fbo_android.end();
 }
