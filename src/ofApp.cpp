@@ -290,10 +290,17 @@ void ofApp::importTargets()
   targetImages.clear();
   for (ofFile f : targetDirectory.getFiles()) {
     ofImage importing;
+    ofImage cropped;
     importing.load(f.getAbsolutePath());
-    if (importing.getWidth() == TARGET_WIDTH && importing.getHeight() == TARGET_HEIGHT) {
-      targetImages.push_back(importing);
-    }
+    cropped.cropFrom(importing, (importing.getWidth() - TARGET_WIDTH) / 2, (importing.getHeight() - TARGET_HEIGHT) / 2, TARGET_WIDTH, TARGET_HEIGHT);
+    targetImages.push_back(cropped);
+  }
+  if (targetImages.size() < FRAME_NUM) {
+    ofSystemAlertDialog("Error! It needs " + ofToString(FRAME_NUM) + " photos or more.");
+
+    return;
+  } else {
+    targetImages.erase(targetImages.begin(), targetImages.begin() + (targetImages.size() - FRAME_NUM));
   }
   chromaKey.keyColor = targetImages[0].getColor(0, 0);
   colorPicker->setColor(chromaKey.keyColor);
