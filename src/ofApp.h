@@ -49,6 +49,7 @@ public:
   void convertSnsMovie();
   void convertAndroidMovie();
   void uploadAll();
+  void printQRcode();
   int  getNewVisitorNumber();
   void say(string msg);
 

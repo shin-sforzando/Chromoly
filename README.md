@@ -40,6 +40,7 @@ Table of Contents
 - [Homebrew](http://brew.sh)
     - [ImageMagick](http://www.imagemagick.org/)
     - [FFmpeg](https://www.ffmpeg.org)
+    - [S3cmd](http://s3tools.org/s3cmd)
     - [QREncode](http://fukuchi.org/works/qrencode/)
 
 ## How to Setup

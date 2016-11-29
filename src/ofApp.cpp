@@ -295,6 +295,7 @@ void ofApp::onButtonExportEvent(ofxDatGuiButtonEvent e)
 
 void ofApp::importTargets()
 {
+  ofApp::say("Images loading has started.");
   ofDirectory targetDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/import");
   targetDirectory.allowExt("jpg");
   targetDirectory.listDir();
@@ -318,6 +319,7 @@ void ofApp::importTargets()
   sliderCurrentFrame->setMax(targetImages.size() - 1);
   sliderWebCaptureFrame->setMax(targetImages.size() - 1);
   isTargetLoaded = true;
+  ofApp::say("Images loading is completed.");
 }
 
 void ofApp::importWebBackground()
@@ -412,6 +414,13 @@ void ofApp::convertAndroidMovie()
 
 void ofApp::uploadAll()
 {
+  ofSystem("/usr/local/bin/s3cmd sync --recursive --force --acl-public --guess-mime-type " + exportDirectory.getAbsolutePath() + " s3://nina-ricci/");
+  ofApp::say("Movies uploading is completed.");
+}
+
+void ofApp::printQRcode()
+{
+  ofApp::say("QR code printing is completed.");
 }
 
 int ofApp::getNewVisitorNumber()

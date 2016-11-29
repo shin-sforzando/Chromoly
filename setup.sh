@@ -32,5 +32,8 @@ brew install imagemagick
 ## Install ffmpeg
 brew install ffmpeg
 
+## Install s3cmd
+brew install s3cmd
+
 ## Install QREncode
 brew install qrencode
