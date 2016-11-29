@@ -11,6 +11,9 @@ void ofApp::setup()
 
   gui = new ofxDatGui(0, 0);
   gui->setTheme(new ofxDatGuiCustomFontSize);
+  textVisitorNumber = gui->addTextInput("Visitor Number", ofToString(ofApp::getNewVisitorNumber()));
+  textVisitorNumber->setInputType(ofxDatGuiInputType::NUMERIC);
+  textVisitorNumber->onTextInputEvent(this, &ofApp::onTextVisitorNumberEvent);
   gui->addFRM();
   sliderPreviewFramerate = gui->addSlider("Preview fps", 0.0, 60.0);
   sliderPreviewFramerate->setPrecision(0);
@@ -126,14 +129,10 @@ void ofApp::draw()
   }
 
   // LEFT BOTTOM:   GUI
-  // TODO: Notice exporting
 
   // MIDDLE TOP:    WEB
   webCheckerImage.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
   fbo_web.draw(ofGetWidth() * leftPaneRatio, 0, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
-  if (isExporting) {
-    ofApp::exportForWeb();
-  }
 
   // MIDDLE BOTTOM: SNS
   fbo_sns.draw(ofGetWidth() * leftPaneRatio, ofGetHeight() / 2, ofGetWidth() * middlePaneRatio, ofGetWidth() * middlePaneRatio);
@@ -151,7 +150,9 @@ void ofApp::draw()
     currentFrame++;
   } else {
     currentFrame = 0;
-    isExporting  = false;
+    if (isExporting) {
+      ofApp::exportFinish();
+    }
   }
 }
 
@@ -160,6 +161,7 @@ void ofApp::keyPressed(int key)
   switch (key) {
     case 'x':
       // For Debug!
+      ofApp::convertAndroidMovie();
       break;
     case 'i':
     case 'l':
@@ -182,8 +184,7 @@ void ofApp::keyPressed(int key)
       importAndroidBackgrounds();
       break;
     case 'e':
-      isExporting  = true;
-      currentFrame = 0;
+      ofApp::exportStart();
       break;
     case OF_KEY_UP:
       chromaKey.threshold += 0.005;
@@ -247,6 +248,17 @@ void ofApp::dragEvent(ofDragInfo dragInfo)
 
 void ofApp::gotMessage(ofMessage msg)
 {
+  ofApp::say(msg.message);
+}
+
+void ofApp::onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e)
+{
+  if (e.text != "") {
+    visitorNumber = ofToInt(e.text);
+  } else {
+    visitorNumber = ofApp::getNewVisitorNumber();
+    textVisitorNumber->setText(ofToString(visitorNumber));
+  }
 }
 
 void ofApp::onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e)
@@ -278,8 +290,7 @@ void ofApp::onPadSnsPosition(ofxDatGui2dPadEvent e)
 
 void ofApp::onButtonExportEvent(ofxDatGuiButtonEvent e)
 {
-  isExporting  = true;
-  currentFrame = 0;
+  ofApp::exportStart();
 }
 
 void ofApp::importTargets()
@@ -296,11 +307,11 @@ void ofApp::importTargets()
     targetImages.push_back(cropped);
   }
   if (targetImages.size() < FRAME_NUM) {
-    ofSystemAlertDialog("Error! It needs " + ofToString(FRAME_NUM) + " photos or more.");
+    ofSystemAlertDialog("Error! It requires " + ofToString(FRAME_NUM) + " photos or more.");
 
     return;
   } else {
-    targetImages.erase(targetImages.begin(), targetImages.begin() + (targetImages.size() - FRAME_NUM));
+    targetImages.erase(targetImages.begin(), targetImages.begin() + (targetImages.size() - FRAME_NUM - 1));
   }
   chromaKey.keyColor = targetImages[0].getColor(0, 0);
   colorPicker->setColor(chromaKey.keyColor);
@@ -344,12 +355,31 @@ void ofApp::importAndroidBackgrounds()
   isAndroidBackgroundLoaded = true;
 }
 
+void ofApp::exportStart()
+{
+  if (isTargetLoaded) {
+    isExporting  = true;
+    currentFrame = 0;
+    sliderCurrentFrame->setBackgroundColor(ofColor(255, 0, 0));
+    sliderCurrentFrame->setLabel("Exporting...");
+    ofApp::exportForWeb();
+  }
+}
+
+void ofApp::exportFinish()
+{
+  isExporting = false;
+  sliderCurrentFrame->setBackgroundColor(ofColor(250, 250, 250));
+  sliderCurrentFrame->setLabel("Current Frame");
+  ofApp::say("Images exporting is completed.");
+}
+
 void ofApp::exportForWeb()
 {
   ofPixels pixels;
   fbo_web.readToPixels(pixels);
   exportWebImage.setFromPixels(pixels);
-  exportWebImage.save(exportDirectory.getAbsolutePath() + "/web.png", OF_IMAGE_QUALITY_BEST);
+  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0') + "/web.png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForSns()
@@ -357,7 +387,7 @@ void ofApp::exportForSns()
   ofPixels pixels;
   fbo_sns.readToPixels(pixels);
   exportSnsImage.setFromPixels(pixels);
-  exportSnsImage.save(exportDirectory.getAbsolutePath() + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+  exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0') + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForAndroid()
@@ -365,5 +395,51 @@ void ofApp::exportForAndroid()
   ofPixels pixels;
   fbo_android.readToPixels(pixels);
   exportAndroidImage.setFromPixels(pixels);
-  exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+  exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0') + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+}
+
+void ofApp::convertSnsMovie()
+{
+  string path = exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0');
+  ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/" + ofToString(visitorNumber, 3, '0') + "_sns.mp4");
+}
+
+void ofApp::convertAndroidMovie()
+{
+  string path = exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0');
+  ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/" + ofToString(visitorNumber, 3, '0') + ".mp4");
+}
+
+void ofApp::uploadAll()
+{
+}
+
+int ofApp::getNewVisitorNumber()
+{
+  exportDirectory.listDir();
+  int newVisitorNumber = 0;
+  for (ofFile f : exportDirectory.getFiles()) {
+    if (f.isDirectory()) {
+      if (ofIsStringInString(f.getBaseName(), ofGetTimestampString("%Y%m%d"))) {
+        string str_number = f.getBaseName();
+        ofLog() << str_number;
+        ofStringReplace(str_number, ofGetTimestampString("%Y%m%d") + "_", "");
+        int int_number = ofToInt(str_number);
+        if (newVisitorNumber + 1 != int_number) {
+          visitorNumber = newVisitorNumber + 1;
+
+          return visitorNumber;
+        } else {
+          newVisitorNumber = int_number;
+        }
+      }
+    }
+  }
+
+  return newVisitorNumber;
+}
+
+void ofApp::say(string msg)
+{
+  ofSystem("say -v Victoria " + msg);
 }

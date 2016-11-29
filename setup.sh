@@ -15,6 +15,12 @@ git clone -o github https://github.com/tado/ofxChromaKey.git
 git clone -o github https://github.com/braitsch/ofxDatGui.git
 cp -r ofxDatGui/ofxbraitsch $WORKING_DIR/bin/data
 
+# Install ofxParagraph
+git clone --recursive git@github.com:braitsch/ofxParagraph.git
+
+# Install ofxModal
+git clone --recursive git@github.com:braitsch/ofxModal.git
+
 cd $WORKING_DIR
 
 ## Install Homebrew

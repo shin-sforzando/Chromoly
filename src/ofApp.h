@@ -30,6 +30,7 @@ public:
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
 
+  void onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e);
   void onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e);
   void onButtonReloadEvent(ofxDatGuiButtonEvent e);
   void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
@@ -40,9 +41,16 @@ public:
   void importWebBackground();
   void importSnsBackgrounds();
   void importAndroidBackgrounds();
+  void exportStart();
+  void exportFinish();
   void exportForWeb();
   void exportForSns();
   void exportForAndroid();
+  void convertSnsMovie();
+  void convertAndroidMovie();
+  void uploadAll();
+  int  getNewVisitorNumber();
+  void say(string msg);
 
   bool isTargetLoaded            = false;
   bool isWebBackgroundLoaded     = false;
@@ -57,6 +65,7 @@ public:
   float middlePaneRatio   = WEB_WIDTH / desirableWidth;
   float rightPaneRatio    = ANDROID_WIDTH / desirableWidth;
 
+  int visitorNumber    = 1;
   int previewFramerate = 10;
   int currentFrame     = 0;
 
@@ -81,6 +90,7 @@ public:
   ofxChromaKey chromaKey;
 
   ofxDatGui *gui;
+  ofxDatGuiTextInput *textVisitorNumber;
   ofxDatGuiSlider *sliderPreviewFramerate;
   ofxDatGuiButton *buttonReload;
   ofxDatGuiSlider *sliderCurrentFrame;

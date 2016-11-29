@@ -17,7 +17,7 @@ public:
     stripe.visible = false;
     color.label = hex(0x6E6E6E);
     color.icons = hex(0x6E6E6E);
-    color.background = hex(0xFCFAFD);
+    color.background = hex(0xFAFAFA);
     color.guiBackground = hex(0xD8D8DB);
     color.inputAreaBackground = hex(0xE9E9E9);
     color.slider.fill = hex(0x6E6E6E);
