@@ -6,7 +6,7 @@
 #include "ofxDatGuiCustomFontSize.h"
 #include "ofxXmlSettings.h"
 
-#define FRAME_NUM      36
+#define FRAME_NUM      32
 #define TARGET_WIDTH   640
 #define TARGET_HEIGHT  640
 #define ANDROID_WIDTH  1440
@@ -18,40 +18,45 @@
 
 class ofApp : public ofBaseApp {
 public:
-  void setup();
-  void update();
-  void draw();
-  void keyPressed(int key);
-  void keyReleased(int key);
-  void mouseDragged(int x, int y, int button);
-  void mousePressed(int x, int y, int button);
-  void mouseReleased(int x, int y, int button);
-  void windowResized(int w, int h);
-  void dragEvent(ofDragInfo dragInfo);
-  void gotMessage(ofMessage msg);
+  void   setup();
+  void   update();
+  void   draw();
+  void   keyPressed(int key);
+  void   keyReleased(int key);
+  void   mouseDragged(int x, int y, int button);
+  void   mousePressed(int x, int y, int button);
+  void   mouseReleased(int x, int y, int button);
+  void   windowResized(int w, int h);
+  void   dragEvent(ofDragInfo dragInfo);
+  void   gotMessage(ofMessage msg);
 
-  void onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e);
-  void onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e);
-  void onButtonReloadEvent(ofxDatGuiButtonEvent e);
-  void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
-  void onPadWebPosition(ofxDatGui2dPadEvent e);
-  void onPadSnsPosition(ofxDatGui2dPadEvent e);
-  void onButtonExportEvent(ofxDatGuiButtonEvent e);
-  void importTargets();
-  void importWebBackground();
-  void importSnsBackgrounds();
-  void importAndroidBackgrounds();
-  void exportStart();
-  void exportFinish();
-  void exportForWeb();
-  void exportForSns();
-  void exportForAndroid();
-  void convertSnsMovie();
-  void convertAndroidMovie();
-  void uploadAll();
-  void printQRcode();
-  int  getNewVisitorNumber();
-  void say(string msg);
+  void   onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e);
+  void   onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e);
+  void   onButtonReloadEvent(ofxDatGuiButtonEvent e);
+  void   onColorPickerEvent(ofxDatGuiColorPickerEvent e);
+  void   onPadWebPosition(ofxDatGui2dPadEvent e);
+  void   onPadSnsPosition(ofxDatGui2dPadEvent e);
+  void   onButtonExportEvent(ofxDatGuiButtonEvent e);
+
+  void   importTargets();
+  void   importWebBackground();
+  void   importSnsBackgrounds();
+  void   importAndroidBackgrounds();
+
+  void   exportStart();
+  void   exportFinish();
+  void   exportForWeb();
+  void   exportForSns();
+  void   exportForAndroid();
+  void   convertSnsMovie();
+  void   convertAndroidMovie();
+  void   uploadAll();
+  void   printQRcode();
+  void   prepareNext();
+
+  int    getNewVisitorNumber();
+  string getExportName();
+  void   say(string msg);
 
   bool isTargetLoaded            = false;
   bool isWebBackgroundLoaded     = false;

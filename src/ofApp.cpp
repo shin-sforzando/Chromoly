@@ -1,5 +1,6 @@
 #include "ofApp.h"
 
+ofDirectory targetDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/import");
 ofDirectory exportDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/export");
 
 void ofApp::setup()
@@ -185,7 +186,7 @@ void ofApp::keyPressed(int key)
   switch (key) {
     case 'x':
       // For Debug!
-      ofApp::convertAndroidMovie();
+      ofApp::printQRcode();
       break;
     case 'i':
     case 'l':
@@ -320,7 +321,6 @@ void ofApp::onButtonExportEvent(ofxDatGuiButtonEvent e)
 void ofApp::importTargets()
 {
   ofApp::say("Images loading has started.");
-  ofDirectory targetDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/import");
   targetDirectory.allowExt("jpg");
   targetDirectory.listDir();
   vector <ofFile> reversed = targetDirectory.getFiles();
@@ -403,7 +403,7 @@ void ofApp::exportForWeb()
   ofPixels pixels;
   fbo_web.readToPixels(pixels);
   exportWebImage.setFromPixels(pixels);
-  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0') + "/web.png", OF_IMAGE_QUALITY_BEST);
+  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/web.png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForSns()
@@ -411,7 +411,7 @@ void ofApp::exportForSns()
   ofPixels pixels;
   fbo_sns.readToPixels(pixels);
   exportSnsImage.setFromPixels(pixels);
-  exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0') + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+  exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForAndroid()
@@ -419,18 +419,18 @@ void ofApp::exportForAndroid()
   ofPixels pixels;
   fbo_android.readToPixels(pixels);
   exportAndroidImage.setFromPixels(pixels);
-  exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0') + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
+  exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::convertSnsMovie()
 {
-  string path = exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0');
+  string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
   ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/" + ofToString(visitorNumber, 3, '0') + "_sns.mp4");
 }
 
 void ofApp::convertAndroidMovie()
 {
-  string path = exportDirectory.getAbsolutePath() + "/" + ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0');
+  string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
   ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/" + ofToString(visitorNumber, 3, '0') + ".mp4");
 }
 
@@ -442,32 +442,51 @@ void ofApp::uploadAll()
 
 void ofApp::printQRcode()
 {
+  string url        = "http://nina-xmas.com/share.php?d=" + ofGetTimestampString("%Y%m%d") + "&n=" + ofToString(visitorNumber, 3, '0');
+  string exportPath = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
+  ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"");
+  ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/' " + exportPath + "/url.png");
+  ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png");
+  ofSystem("lpr -P Brother_QL_700 -o PageSize=DC17 -o media=DC17 " + exportPath + "/qr.png");
   ofApp::say("QR code printing is completed.");
+}
+
+void ofApp::prepareNext()
+{
+  ofDirectory backupDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/backup_import");
+  ofSystem("mv " + targetDirectory.getAbsolutePath() + " " + backupDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "&& mkdir " + targetDirectory.getAbsolutePath());
+  visitorNumber = ofApp::getNewVisitorNumber();
+  textVisitorNumber->setText(ofToString(visitorNumber));
 }
 
 int ofApp::getNewVisitorNumber()
 {
   exportDirectory.listDir();
-  int newVisitorNumber = 0;
+  int exVisitorNumber = 0;
   for (ofFile f : exportDirectory.getFiles()) {
     if (f.isDirectory()) {
       if (ofIsStringInString(f.getBaseName(), ofGetTimestampString("%Y%m%d"))) {
         string str_number = f.getBaseName();
-        ofLog() << str_number;
         ofStringReplace(str_number, ofGetTimestampString("%Y%m%d") + "_", "");
         int int_number = ofToInt(str_number);
-        if (newVisitorNumber + 1 != int_number) {
-          visitorNumber = newVisitorNumber + 1;
+        if (exVisitorNumber + 1 != int_number) {
+          visitorNumber = exVisitorNumber + 1;
 
           return visitorNumber;
         } else {
-          newVisitorNumber = int_number;
+          exVisitorNumber = int_number;
         }
       }
     }
   }
+  visitorNumber = exVisitorNumber + 1;
 
-  return newVisitorNumber;
+  return visitorNumber;
+}
+
+string ofApp::getExportName()
+{
+  return ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0');
 }
 
 void ofApp::say(string msg)
