@@ -326,6 +326,8 @@ void ofApp::importTargets()
   vector <ofFile> reversed = targetDirectory.getFiles();
   if (reversed.size() < FRAME_NUM) {
     ofSystemAlertDialog("Error! It requires " + ofToString(FRAME_NUM) + " photos or more.");
+
+    return;
   }
   targetImages.clear();
   reverse(reversed.begin(), reversed.end());
@@ -390,20 +392,12 @@ void ofApp::exportStart()
   }
 }
 
-void ofApp::exportFinish()
-{
-  isExporting = false;
-  sliderCurrentFrame->setBackgroundColor(ofColor(250, 250, 250));
-  sliderCurrentFrame->setLabel("Current Frame");
-  ofApp::say("Images exporting is completed.");
-}
-
 void ofApp::exportForWeb()
 {
   ofPixels pixels;
   fbo_web.readToPixels(pixels);
   exportWebImage.setFromPixels(pixels);
-  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/web.png", OF_IMAGE_QUALITY_BEST);
+  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/" + ofToString(visitorNumber, 3, '0') + "_thumb.png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForSns()
@@ -422,6 +416,20 @@ void ofApp::exportForAndroid()
   exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
 }
 
+void ofApp::exportFinish()
+{
+  isExporting = false;
+  sliderCurrentFrame->setBackgroundColor(ofColor(250, 250, 250));
+  sliderCurrentFrame->setLabel("Current Frame");
+  ofApp::say("Images exporting is completed.");
+
+  ofApp::convertSnsMovie();
+  ofApp::convertAndroidMovie();
+  // ofApp::uploadAll();
+  ofApp::printQRcode();
+  ofApp::prepareNext();
+}
+
 void ofApp::convertSnsMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
@@ -436,6 +444,7 @@ void ofApp::convertAndroidMovie()
 
 void ofApp::uploadAll()
 {
+  ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/(android|sns)_*.png");
   ofSystem("/usr/local/bin/s3cmd sync --recursive --force --acl-public --guess-mime-type " + exportDirectory.getAbsolutePath() + " s3://nina-ricci/");
   ofApp::say("Movies uploading is completed.");
 }

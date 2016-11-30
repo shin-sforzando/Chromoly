@@ -6,7 +6,7 @@
 #include "ofxDatGuiCustomFontSize.h"
 #include "ofxXmlSettings.h"
 
-#define FRAME_NUM      32
+#define FRAME_NUM      36
 #define TARGET_WIDTH   640
 #define TARGET_HEIGHT  640
 #define ANDROID_WIDTH  1440
@@ -44,10 +44,10 @@ public:
   void   importAndroidBackgrounds();
 
   void   exportStart();
-  void   exportFinish();
   void   exportForWeb();
   void   exportForSns();
   void   exportForAndroid();
+  void   exportFinish();
   void   convertSnsMovie();
   void   convertAndroidMovie();
   void   uploadAll();
