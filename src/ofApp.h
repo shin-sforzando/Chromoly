@@ -37,6 +37,8 @@ public:
   void   onPadWebPosition(ofxDatGui2dPadEvent e);
   void   onPadSnsPosition(ofxDatGui2dPadEvent e);
   void   onButtonExportEvent(ofxDatGuiButtonEvent e);
+  void   onButtonUploadEvent(ofxDatGuiButtonEvent e);
+  void   onButtonPrintQREvent(ofxDatGuiButtonEvent e);
 
   void   importTargets();
   void   importWebBackground();
@@ -111,6 +113,8 @@ public:
   ofxDatGuiSlider *sliderSnsOverlayScale;
   ofxDatGui2dPad *padSnsPosition;
   ofxDatGuiButton *buttonExport;
+  ofxDatGuiButton *buttonUpload;
+  ofxDatGuiButton *buttonPrintQR;
 
   ofFbo fbo_web;
   ofFbo fbo_sns;

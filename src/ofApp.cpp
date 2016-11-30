@@ -54,6 +54,12 @@ void ofApp::setup()
   buttonExport = gui->addButton("Export");
   buttonExport->onButtonEvent(this, &ofApp::onButtonExportEvent);
   buttonExport->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+  buttonUpload = gui->addButton("Upload All");
+  buttonUpload->onButtonEvent(this, &ofApp::onButtonUploadEvent);
+  buttonUpload->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+  buttonPrintQR = gui->addButton("Print QR code");
+  buttonPrintQR->onButtonEvent(this, &ofApp::onButtonPrintQREvent);
+  buttonPrintQR->setLabelAlignment(ofxDatGuiAlignment::CENTER);
   ofApp::windowResized(1400, 718);
 
   fbo_android.allocate(ANDROID_WIDTH, ANDROID_HEIGHT);
@@ -318,6 +324,16 @@ void ofApp::onButtonExportEvent(ofxDatGuiButtonEvent e)
   ofApp::exportStart();
 }
 
+void ofApp::onButtonUploadEvent(ofxDatGuiButtonEvent e)
+{
+  ofApp::uploadAll();
+}
+
+void ofApp::onButtonPrintQREvent(ofxDatGuiButtonEvent e)
+{
+  ofApp::printQRcode();
+}
+
 void ofApp::importTargets()
 {
   ofApp::say("Images loading has started.");
@@ -454,7 +470,7 @@ void ofApp::printQRcode()
   string url        = "http://nina-xmas.com/share.php?d=" + ofGetTimestampString("%Y%m%d") + "&n=" + ofToString(visitorNumber, 3, '0');
   string exportPath = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
   ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"");
-  ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/' " + exportPath + "/url.png");
+  ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(visitorNumber, 3, '0') + "' " + exportPath + "/url.png");
   ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png");
   ofSystem("lpr -P Brother_QL_700 -o PageSize=DC17 -o media=DC17 " + exportPath + "/qr.png");
   ofApp::say("QR code printing is completed.");
