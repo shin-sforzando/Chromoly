@@ -299,20 +299,19 @@ void ofApp::importTargets()
   ofDirectory targetDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/import");
   targetDirectory.allowExt("jpg");
   targetDirectory.listDir();
+  vector <ofFile> reversed = targetDirectory.getFiles();
+  if (reversed.size() < FRAME_NUM) {
+    ofSystemAlertDialog("Error! It requires " + ofToString(FRAME_NUM) + " photos or more.");
+  }
   targetImages.clear();
-  for (ofFile f : targetDirectory.getFiles()) {
+  reverse(reversed.begin(), reversed.end());
+  for (int i = 0; i < FRAME_NUM; i++) {
     ofImage importing;
     ofImage cropped;
-    importing.load(f.getAbsolutePath());
+    importing.load(reversed[i].getAbsolutePath());
+    ofLog() << reversed[i].getAbsolutePath();  // TODO: Just Debug!
     cropped.cropFrom(importing, (importing.getWidth() - TARGET_WIDTH) / 2, (importing.getHeight() - TARGET_HEIGHT) / 2, TARGET_WIDTH, TARGET_HEIGHT);
     targetImages.push_back(cropped);
-  }
-  if (targetImages.size() < FRAME_NUM) {
-    ofSystemAlertDialog("Error! It requires " + ofToString(FRAME_NUM) + " photos or more.");
-
-    return;
-  } else {
-    targetImages.erase(targetImages.begin(), targetImages.begin() + (targetImages.size() - FRAME_NUM - 1));
   }
   chromaKey.keyColor = targetImages[0].getColor(0, 0);
   colorPicker->setColor(chromaKey.keyColor);
