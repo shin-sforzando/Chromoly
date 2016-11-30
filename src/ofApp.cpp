@@ -110,6 +110,12 @@ void ofApp::update()
   ofSetColor(0);
   ofDrawRectangle(0, 0, fbo_android.getWidth(), fbo_android.getHeight());
   ofSetColor(255);
+
+  // +------------+
+  // |   TARGET   |
+  // +------------+
+  // | BACKGROUND |
+  // +------------+
   if (isTargetLoaded) {
     chromaKey.begin();
     targetImages[currentFrame].draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 - TARGET_HEIGHT);
@@ -118,6 +124,24 @@ void ofApp::update()
   if (isAndroidBackgroundLoaded) {
     androidBackgroundImages[currentFrame].draw(0, 651 + 93);
   }
+
+  // // +------------+
+  // // | BACKGROUND |
+  // // +------------+
+  // // |   TARGET   |
+  // // +------------+
+  // if (isAndroidBackgroundLoaded) {
+  //   androidBackgroundImages[currentFrame].draw(0, 0);
+  // }
+  // if (isTargetLoaded) {
+  //   ofImage flipped;
+  //   flipped.clone(targetImages[currentFrame]);
+  //   flipped.mirror(true, false);
+  //   chromakey.begin();
+  //   flipped.draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 + 93);
+  //   chromakey.end();
+  // }
+
   fbo_android.end();
 }
 
@@ -309,9 +333,8 @@ void ofApp::importTargets()
     ofImage importing;
     ofImage cropped;
     importing.load(reversed[i].getAbsolutePath());
-    ofLog() << reversed[i].getAbsolutePath();  // TODO: Just Debug!
     cropped.cropFrom(importing, (importing.getWidth() - TARGET_WIDTH) / 2, (importing.getHeight() - TARGET_HEIGHT) / 2, TARGET_WIDTH, TARGET_HEIGHT);
-    targetImages.push_back(cropped);
+    targetImages.insert(targetImages.begin(), cropped);
   }
   chromaKey.keyColor = targetImages[0].getColor(0, 0);
   colorPicker->setColor(chromaKey.keyColor);

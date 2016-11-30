@@ -101,6 +101,19 @@ Table of Contents
     * Use 2D pad to adjust position
 1. Push "Export" button to export synthesized images
 
+### Misc. 1: Annotate text on images using ImageMagick
+```
+for i in {00001..40};do
+  mogrify -font Silom -pointsize 96 -gravity center -annotate 0 $i -fill red target_$i.JPG
+done
+```
+
+### Misc. 2: Flip all images using ImageMagick
+```mogrify -resize 1920x *.JPG```
+
+### Misc. 3: Resize all images using ImageMagick
+```mogrify -flip *.jpg```
+
 ### Keyboard shortcut
 
 - b
