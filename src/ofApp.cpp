@@ -12,9 +12,9 @@ void ofApp::setup()
   ofLogToFile(exportDirectory.getAbsolutePath() + "/Chromoly_" + ofGetTimestampString("%Y%m%d") + ".log", true);
 
   if (settings.loadFile(SETTINGS_XML)) {
-    ofApp::logWithTimestamp(SETTINGS_XML + " has been loaded.");
+    ofApp::logWithTimestamp("SETTING_XML has been loaded.");
   } else {
-    ofApp::logWithTimestamp(SETTINGS_XML + " couldn't been loaded.");
+    ofApp::logWithTimestamp("SETTING_XML couldn't been loaded.");
     chromaKey.keyColor  = ofColor::fromHex(0x00FF00);  // XXX: It's not reflect in label.
     chromaKey.threshold = 0.1;
   }
