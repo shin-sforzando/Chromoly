@@ -9,6 +9,15 @@ void ofApp::setup()
   ofSetVerticalSync(true);
   ofEnableAlphaBlending();
   ofSetFrameRate(previewFramerate);
+  ofLogToFile(exportDirectory.getAbsolutePath() + "/Chromoly_" + ofGetTimestampString("%Y%m%d") + ".log", true);
+
+  if (settings.loadFile(SETTINGS_XML)) {
+    ofApp::logWithTimestamp(SETTINGS_XML + " has been loaded.");
+  } else {
+    ofApp::logWithTimestamp(SETTINGS_XML + " couldn't been loaded.");
+    chromaKey.keyColor  = ofColor::fromHex(0x00FF00);  // XXX: It's not reflect in label.
+    chromaKey.threshold = 0.1;
+  }
 
   gui = new ofxDatGui(0, 0);
   gui->setTheme(new ofxDatGuiCustomFontSize);
@@ -23,14 +32,14 @@ void ofApp::setup()
   buttonReload = gui->addButton("Reload");
   buttonReload->onButtonEvent(this, &ofApp::onButtonReloadEvent);
   buttonReload->setLabelAlignment(ofxDatGuiAlignment::CENTER);
-  buttonReload->setBorder(ofColor::red, 10);
   sliderCurrentFrame = gui->addSlider("Current Frame", 0.0, 30.0, 0.0);
   sliderCurrentFrame->setPrecision(0);
   sliderCurrentFrame->bind(currentFrame);
   folderChromakey = gui->addFolder("Chroma Key");
   colorPicker     = folderChromakey->addColorPicker(" - Key Color");
+  colorPicker->setColor(chromaKey.keyColor);
   colorPicker->onColorPickerEvent(this, &ofApp::onColorPickerEvent);
-  sliderThreshold = folderChromakey->addSlider(" - Threshold", 0, 1.0, 0.1);
+  sliderThreshold = folderChromakey->addSlider(" - Threshold", 0, 1.0, chromaKey.threshold);
   sliderThreshold->setPrecision(3);
   sliderThreshold->bind(chromaKey.threshold);
   folderChromakey->expand();
@@ -54,6 +63,7 @@ void ofApp::setup()
   buttonExport = gui->addButton("Export");
   buttonExport->onButtonEvent(this, &ofApp::onButtonExportEvent);
   buttonExport->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+  gui->addBreak()->setHeight(10.0f);
   buttonUpload = gui->addButton("Upload All");
   buttonUpload->onButtonEvent(this, &ofApp::onButtonUploadEvent);
   buttonUpload->setLabelAlignment(ofxDatGuiAlignment::CENTER);
@@ -282,6 +292,11 @@ void ofApp::gotMessage(ofMessage msg)
   ofApp::say(msg.message);
 }
 
+void ofApp::exit()
+{
+  // TODO: exporting SETTINGS_XML.
+}
+
 void ofApp::onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e)
 {
   if (e.text != "") {
@@ -342,6 +357,7 @@ void ofApp::importTargets()
   vector <ofFile> reversed = targetDirectory.getFiles();
   if (reversed.size() < FRAME_NUM) {
     ofSystemAlertDialog("Error! It requires " + ofToString(FRAME_NUM) + " photos or more.");
+    ofApp::logWithTimestamp("Error: Target photos aren't enough.");
 
     return;
   }
@@ -449,19 +465,23 @@ void ofApp::exportFinish()
 void ofApp::convertSnsMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/" + ofToString(visitorNumber, 3, '0') + "_sns.mp4");
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/" + ofToString(visitorNumber, 3, '0') + "_main.mp4" +
+                                   " && echo Converting SNS mp4 was a success. || echo Error: Converting SNS mp4 was a failure."));
 }
 
 void ofApp::convertAndroidMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/" + ofToString(visitorNumber, 3, '0') + ".mp4");
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/" + ofToString(visitorNumber, 3, '0') + ".mp4" +
+                                   " && echo Converting Android mp4 was a success. || echo Error: Converting Android mp4 was a failure."));
 }
 
 void ofApp::uploadAll()
 {
-  ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/(android|sns)_*.png");
-  ofSystem("/usr/local/bin/s3cmd sync --recursive --force --acl-public --guess-mime-type " + exportDirectory.getAbsolutePath() + " s3://nina-ricci/");
+  ofApp::logWithTimestamp(ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/(android|sns)_*.png" +
+                                   " && echo Deleting temporally PNG files was a failure. || echo Error: Deleting temporally PNG files was a failure."));
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/s3cmd sync --recursive --force --acl-public --guess-mime-type " + exportDirectory.getAbsolutePath() + " s3://nina-ricci/" +
+                                   " && echo S3cmd syncing was a success. || echo Error: S3cmd syncing was a failure."));
   ofApp::say("Movies uploading is completed.");
 }
 
@@ -469,19 +489,23 @@ void ofApp::printQRcode()
 {
   string url        = "http://nina-xmas.com/share.php?d=" + ofGetTimestampString("%Y%m%d") + "&n=" + ofToString(visitorNumber, 3, '0');
   string exportPath = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"");
-  ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(visitorNumber, 3, '0') + "' " + exportPath + "/url.png");
-  ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png");
-  ofSystem("lpr -P Brother_QL_700 -o PageSize=DC17 -o media=DC17 " + exportPath + "/qr.png");
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"" + " && echo Making QR code image was a success. || echo Error: Making QR code image was a failure."));
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(visitorNumber, 3, '0') + "' " + exportPath + "/url.png" +
+                                   " && echo Making URL image was a success. || echo Error: Making URL image was a failure."));
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png" +
+                                   " && echo Composing QR code was a success. || echo Error: Composing QR code was a failure."));
+  ofApp::logWithTimestamp(ofSystem("lpr -P Brother_QL_700 -o PageSize=DC17 -o media=DC17 " + exportPath + "/qr.png" + " && echo QR code printing was a success. || echo Error: QR code printing was a failure."));
   ofApp::say("QR code printing is completed.");
 }
 
 void ofApp::prepareNext()
 {
   ofDirectory backupDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/backup_import");
-  ofSystem("mv " + targetDirectory.getAbsolutePath() + " " + backupDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "&& mkdir " + targetDirectory.getAbsolutePath());
+  ofApp::logWithTimestamp(ofSystem("mv " + targetDirectory.getAbsolutePath() + " " + backupDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + " && mkdir " + targetDirectory.getAbsolutePath() +
+                                   " && echo Archiving ex-Target photos was a success. || echo Error: Archiving ex-Target photos was a failure."));
   visitorNumber = ofApp::getNewVisitorNumber();
   textVisitorNumber->setText(ofToString(visitorNumber));
+  ofApp::logWithTimestamp(" -> " + ofToString(visitorNumber, 3, '0'));
 }
 
 int ofApp::getNewVisitorNumber()
@@ -517,4 +541,10 @@ string ofApp::getExportName()
 void ofApp::say(string msg)
 {
   ofSystem("say -v Victoria " + msg);
+  ofApp::logWithTimestamp(msg);
+}
+
+void ofApp::logWithTimestamp(string msg)
+{
+  ofLog() << ofGetTimestampString("%H:%M:%D") << " " << msg;
 }

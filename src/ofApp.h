@@ -15,50 +15,55 @@
 #define SNS_HEIGHT     640
 #define WEB_WIDTH      640
 #define WEB_HEIGHT     640
+#define SETTINGS_XML   "settings.xml"
 
 class ofApp : public ofBaseApp {
 public:
-  void   setup();
-  void   update();
-  void   draw();
-  void   keyPressed(int key);
-  void   keyReleased(int key);
-  void   mouseDragged(int x, int y, int button);
-  void   mousePressed(int x, int y, int button);
-  void   mouseReleased(int x, int y, int button);
-  void   windowResized(int w, int h);
-  void   dragEvent(ofDragInfo dragInfo);
-  void   gotMessage(ofMessage msg);
+  void setup();
+  void update();
+  void draw();
+  void keyPressed(int key);
+  void keyReleased(int key);
+  void mouseDragged(int x, int y, int button);
+  void mousePressed(int x, int y, int button);
+  void mouseReleased(int x, int y, int button);
+  void windowResized(int w, int h);
+  void dragEvent(ofDragInfo dragInfo);
+  void gotMessage(ofMessage msg);
+  void exit();
 
-  void   onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e);
-  void   onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e);
-  void   onButtonReloadEvent(ofxDatGuiButtonEvent e);
-  void   onColorPickerEvent(ofxDatGuiColorPickerEvent e);
-  void   onPadWebPosition(ofxDatGui2dPadEvent e);
-  void   onPadSnsPosition(ofxDatGui2dPadEvent e);
-  void   onButtonExportEvent(ofxDatGuiButtonEvent e);
-  void   onButtonUploadEvent(ofxDatGuiButtonEvent e);
-  void   onButtonPrintQREvent(ofxDatGuiButtonEvent e);
+  void onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e);
+  void onSliderPreviewFramerateEvent(ofxDatGuiSliderEvent e);
+  void onButtonReloadEvent(ofxDatGuiButtonEvent e);
+  void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
+  void onPadWebPosition(ofxDatGui2dPadEvent e);
+  void onPadSnsPosition(ofxDatGui2dPadEvent e);
+  void onButtonExportEvent(ofxDatGuiButtonEvent e);
+  void onButtonUploadEvent(ofxDatGuiButtonEvent e);
+  void onButtonPrintQREvent(ofxDatGuiButtonEvent e);
 
-  void   importTargets();
-  void   importWebBackground();
-  void   importSnsBackgrounds();
-  void   importAndroidBackgrounds();
+  void importTargets();
+  void importWebBackground();
+  void importSnsBackgrounds();
+  void importAndroidBackgrounds();
 
-  void   exportStart();
-  void   exportForWeb();
-  void   exportForSns();
-  void   exportForAndroid();
-  void   exportFinish();
-  void   convertSnsMovie();
-  void   convertAndroidMovie();
-  void   uploadAll();
-  void   printQRcode();
-  void   prepareNext();
+  void exportStart();
+  void exportForWeb();
+  void exportForSns();
+  void exportForAndroid();
+  void exportFinish();
+  void convertSnsMovie();
+  void convertAndroidMovie();
+  void uploadAll();
+  void printQRcode();
+  void prepareNext();
 
-  int    getNewVisitorNumber();
+  int getNewVisitorNumber();
   string getExportName();
-  void   say(string msg);
+  void say(string msg);
+  void logWithTimestamp(string msg);
+
+  ofxXmlSettings settings;
 
   bool isTargetLoaded            = false;
   bool isWebBackgroundLoaded     = false;
@@ -84,7 +89,6 @@ public:
   float snsOverlayScale = 0.4;
   int snsOverlayX       = SNS_WIDTH / 2;
   int snsOverlayY       = SNS_HEIGHT / 2;
-
 
   vector <ofImage> targetImages;
   vector <ofImage> snsBackgroundImages;

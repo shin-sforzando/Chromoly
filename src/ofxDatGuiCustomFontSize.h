@@ -35,10 +35,10 @@ public:
     color.pad2d.ball = hex(0x6E6E6E);
     color.graph.fills = hex(0x6E6E6E);
 
-    font.size = 10;
+    font.size = 9;
     font.file = "M+2VM+IPAG-circle.ttf";
     layout.upperCaseLabels = false;
-    
+
     init();
   }
 };
