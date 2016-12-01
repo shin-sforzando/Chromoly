@@ -102,10 +102,12 @@ public:
 
   // Images
   vector <ofImage> targetImages;
-  vector <ofImage> snsBackgroundImages;
-  vector <ofImage> androidBackgroundImages;
+  // vector <ofImage> snsBackgroundImages;
+  // vector <ofImage> androidBackgroundImages;
   ofImage webBackgroundImage;
   ofImage webCheckerImage;
+  ofImage snsBackgroundImage;
+  ofImage androidBackgroundImage;
   ofImage exportWebImage;
   ofImage exportSnsImage;
   ofImage exportAndroidImage;
@@ -137,4 +139,5 @@ public:
   ofFbo fbo_web;
   ofFbo fbo_sns;
   ofFbo fbo_android;
+  ofPixels pixels;
 };

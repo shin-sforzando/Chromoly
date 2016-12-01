@@ -44,7 +44,7 @@ void ofApp::setup()
   sliderThreshold->bind(chromaKey.threshold);
   folderChromakey->expand();
   folderWebOverlay      = gui->addFolder("For Web:");
-  sliderWebCaptureFrame = folderWebOverlay->addSlider(" - Frame", 0.0, 30.0);
+  sliderWebCaptureFrame = folderWebOverlay->addSlider(" - Capture Frame", 0.0, 30.0);
   sliderWebCaptureFrame->setPrecision(0);
   sliderWebCaptureFrame->bind(webCaptureFrame);
   sliderWebOverlayScale = folderWebOverlay->addSlider(" - Scale", 0.0, 1.0);
@@ -111,7 +111,7 @@ void ofApp::update()
   fbo_sns.begin();
   ofClear(0);
   if (isSnsBackgroundLoaded) {
-    snsBackgroundImages[currentFrame].draw(0, 0);
+    snsBackgroundImage.draw(0, 0);
   }
   if (isTargetLoaded) {
     chromaKey.begin();
@@ -128,36 +128,36 @@ void ofApp::update()
   ofDrawRectangle(0, 0, fbo_android.getWidth(), fbo_android.getHeight());
   ofSetColor(255);
 
-  // +------------+
-  // |   TARGET   |
-  // +------------+
-  // | BACKGROUND |
-  // +------------+
-  if (isTargetLoaded) {
-    chromaKey.begin();
-    targetImages[currentFrame].draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 - TARGET_HEIGHT);
-    chromaKey.end();
-  }
-  if (isAndroidBackgroundLoaded) {
-    androidBackgroundImages[currentFrame].draw(0, 651 + 93);
-  }
-
-  // // +------------+
-  // // | BACKGROUND |
   // // +------------+
   // // |   TARGET   |
   // // +------------+
-  // if (isAndroidBackgroundLoaded) {
-  //   androidBackgroundImages[currentFrame].draw(0, 0);
-  // }
+  // // | BACKGROUND |
+  // // +------------+
   // if (isTargetLoaded) {
-  //   ofImage flipped;
-  //   flipped.clone(targetImages[currentFrame]);
-  //   flipped.mirror(true, false);
-  //   chromakey.begin();
-  //   flipped.draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 + 93);
-  //   chromakey.end();
+  //   chromaKey.begin();
+  //   targetImages[currentFrame].draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 - TARGET_HEIGHT);
+  //   chromaKey.end();
   // }
+  // if (isAndroidBackgroundLoaded) {
+  //   androidBackgroundImage.draw(0, 651 + 93);
+  // }
+
+  // +------------+
+  // | BACKGROUND |
+  // +------------+
+  // |   TARGET   |
+  // +------------+
+  if (isAndroidBackgroundLoaded) {
+    androidBackgroundImage.draw(0, 0);
+  }
+  if (isTargetLoaded) {
+    ofImage flipped;
+    flipped.clone(targetImages[currentFrame]);
+    flipped.mirror(true, false);
+    chromaKey.begin();
+    flipped.draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 + 93);
+    chromaKey.end();
+  }
 
   fbo_android.end();
 }
@@ -187,7 +187,7 @@ void ofApp::draw()
     ofApp::exportForAndroid();
   }
 
-  if (isTargetLoaded && currentFrame + 1 < min(targetImages.size() - 1, androidBackgroundImages.size() - 1)) {
+  if (isTargetLoaded && currentFrame < targetImages.size() - 1) {
     currentFrame++;
   } else {
     currentFrame = 0;
@@ -387,29 +387,31 @@ void ofApp::importWebBackground()
 
 void ofApp::importSnsBackgrounds()
 {
-  ofDirectory snsBackgroundDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_sns");
-  snsBackgroundDirectory.allowExt("jpg");
-  snsBackgroundDirectory.listDir();
-  snsBackgroundImages.clear();
-  for (ofFile f : snsBackgroundDirectory.getFiles()) {
-    ofImage importing;
-    importing.load(f.getAbsolutePath());
-    snsBackgroundImages.push_back(importing);
-  }
+  // ofDirectory snsBackgroundDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_sns");
+  // snsBackgroundDirectory.allowExt("jpg");
+  // snsBackgroundDirectory.listDir();
+  // snsBackgroundImages.clear();
+  // for (ofFile f : snsBackgroundDirectory.getFiles()) {
+  //   ofImage importing;
+  //   importing.load(f.getAbsolutePath());
+  //   snsBackgroundImages.push_back(importing);
+  // }
+  snsBackgroundImage.load(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_sns/sns.jpg");
   isSnsBackgroundLoaded = true;
 }
 
 void ofApp::importAndroidBackgrounds()
 {
-  ofDirectory androidBackgroundDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_android");
-  androidBackgroundDirectory.allowExt("jpg");
-  androidBackgroundDirectory.listDir();
-  androidBackgroundImages.clear();
-  for (ofFile f : androidBackgroundDirectory.getFiles()) {
-    ofImage importing;
-    importing.load(f.getAbsolutePath());
-    androidBackgroundImages.push_back(importing);
-  }
+  // ofDirectory androidBackgroundDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_android");
+  // androidBackgroundDirectory.allowExt("jpg");
+  // androidBackgroundDirectory.listDir();
+  // androidBackgroundImages.clear();
+  // for (ofFile f : androidBackgroundDirectory.getFiles()) {
+  //   ofImage importing;
+  //   importing.load(f.getAbsolutePath());
+  //   androidBackgroundImages.push_back(importing);
+  // }
+  androidBackgroundImage.load(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_android/android.jpg");
   isAndroidBackgroundLoaded = true;
 }
 
@@ -426,23 +428,23 @@ void ofApp::exportStart()
 
 void ofApp::exportForWeb()
 {
-  ofPixels pixels;
   fbo_web.readToPixels(pixels);
   exportWebImage.setFromPixels(pixels);
-  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/" + ofToString(visitorNumber, 3, '0') + "_thumb.png", OF_IMAGE_QUALITY_BEST);
+  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/white.png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForSns()
 {
-  ofPixels pixels;
   fbo_sns.readToPixels(pixels);
   exportSnsImage.setFromPixels(pixels);
+  if (currentFrame == 0) {
+    exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/main.png", OF_IMAGE_QUALITY_BEST);
+  }
   exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForAndroid()
 {
-  ofPixels pixels;
   fbo_android.readToPixels(pixels);
   exportAndroidImage.setFromPixels(pixels);
   exportAndroidImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/android_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
@@ -465,14 +467,14 @@ void ofApp::exportFinish()
 void ofApp::convertSnsMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/" + ofToString(visitorNumber, 3, '0') + "_main.mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/main.mp4" +
                                    " && echo Converting SNS mp4 was a success. || echo Error: Converting SNS mp4 was a failure."));
 }
 
 void ofApp::convertAndroidMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/" + ofToString(visitorNumber, 3, '0') + ".mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
                                    " && echo Converting Android mp4 was a success. || echo Error: Converting Android mp4 was a failure."));
 }
 
@@ -501,30 +503,28 @@ void ofApp::printQRcode()
 void ofApp::prepareNext()
 {
   ofDirectory backupDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/backup_import");
-  ofApp::logWithTimestamp(ofSystem("mv " + targetDirectory.getAbsolutePath() + " " + backupDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + " && mkdir " + targetDirectory.getAbsolutePath() +
+  string      dirPath = backupDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/";
+  ofApp::logWithTimestamp(ofSystem("mkdir -p " + dirPath + " && mv -f " + targetDirectory.getAbsolutePath() + "/* " + dirPath + " && mkdir " + targetDirectory.getAbsolutePath() +
                                    " && echo Archiving ex-Target photos was a success. || echo Error: Archiving ex-Target photos was a failure."));
   visitorNumber = ofApp::getNewVisitorNumber();
   textVisitorNumber->setText(ofToString(visitorNumber));
-  ofApp::logWithTimestamp(" -> " + ofToString(visitorNumber, 3, '0'));
+  ofApp::logWithTimestamp(" ---------------------------------------> " + ofToString(visitorNumber, 3, '0'));
 }
 
 int ofApp::getNewVisitorNumber()
 {
-  exportDirectory.listDir();
+  ofDirectory todayDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/export/" + ofGetTimestampString("%Y%m%d"));
+  todayDirectory.listDir();
   int exVisitorNumber = 0;
-  for (ofFile f : exportDirectory.getFiles()) {
+  for (ofFile f : todayDirectory.getFiles()) {
     if (f.isDirectory()) {
-      if (ofIsStringInString(f.getBaseName(), ofGetTimestampString("%Y%m%d"))) {
-        string str_number = f.getBaseName();
-        ofStringReplace(str_number, ofGetTimestampString("%Y%m%d") + "_", "");
-        int int_number = ofToInt(str_number);
-        if (exVisitorNumber + 1 != int_number) {
-          visitorNumber = exVisitorNumber + 1;
+      int int_number = ofToInt(f.getBaseName());
+      if (exVisitorNumber + 1 != int_number) {
+        visitorNumber = exVisitorNumber + 1;
 
-          return visitorNumber;
-        } else {
-          exVisitorNumber = int_number;
-        }
+        return visitorNumber;
+      } else {
+        exVisitorNumber = int_number;
       }
     }
   }
@@ -535,7 +535,7 @@ int ofApp::getNewVisitorNumber()
 
 string ofApp::getExportName()
 {
-  return ofGetTimestampString("%Y%m%d") + "_" + ofToString(visitorNumber, 3, '0');
+  return ofGetTimestampString("%Y%m%d") + "/" + ofToString(visitorNumber, 3, '0');
 }
 
 void ofApp::say(string msg)
