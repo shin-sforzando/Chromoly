@@ -202,7 +202,6 @@ void ofApp::keyPressed(int key)
   switch (key) {
     case 'x':
       // For Debug!
-      ofApp::printQRcode();
       break;
     case 'i':
     case 'l':
@@ -459,7 +458,7 @@ void ofApp::exportFinish()
 
   ofApp::convertSnsMovie();
   ofApp::convertAndroidMovie();
-  // ofApp::uploadAll();
+  ofApp::uploadAll();
   ofApp::printQRcode();
   ofApp::prepareNext();
 }
@@ -467,22 +466,25 @@ void ofApp::exportFinish()
 void ofApp::convertSnsMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/main.mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/main.mp4" +
                                    " && echo Converting SNS mp4 was a success. || echo Error: Converting SNS mp4 was a failure."));
 }
 
 void ofApp::convertAndroidMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
                                    " && echo Converting Android mp4 was a success. || echo Error: Converting Android mp4 was a failure."));
 }
 
 void ofApp::uploadAll()
 {
-  ofApp::logWithTimestamp(ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/(android|sns)_*.png" +
-                                   " && echo Deleting temporally PNG files was a failure. || echo Error: Deleting temporally PNG files was a failure."));
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/s3cmd sync --recursive --force --acl-public --guess-mime-type " + exportDirectory.getAbsolutePath() + " s3://nina-ricci/" +
+  // Delete Temporary
+  ofApp::logWithTimestamp(ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/android_*.png" +
+                                   " && echo Deleting temporary Android PNG files was a success. || echo Error: Deleting temporary Android PNG files was a failure."));
+  ofApp::logWithTimestamp(ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/sns_*.png" +
+                                   " && echo Deleting temporary SNS PNG files was a sucess. || echo Error: Deleting temporary SNS PNG files was a failure."));
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/s3cmd sync --force --recursive --acl-public --no-guess-mime-type --no-check-md5 --exclude='.DS_Store' " + exportDirectory.getAbsolutePath() + "/ s3://data.nina-xmas.com/" +
                                    " && echo S3cmd syncing was a success. || echo Error: S3cmd syncing was a failure."));
   ofApp::say("Movies uploading is completed.");
 }
@@ -504,8 +506,7 @@ void ofApp::prepareNext()
 {
   ofDirectory backupDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/backup_import");
   string      dirPath = backupDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/";
-  ofApp::logWithTimestamp(ofSystem("mkdir -p " + dirPath + " && mv -f " + targetDirectory.getAbsolutePath() + "/* " + dirPath + " && mkdir " + targetDirectory.getAbsolutePath() +
-                                   " && echo Archiving ex-Target photos was a success. || echo Error: Archiving ex-Target photos was a failure."));
+  ofApp::logWithTimestamp(ofSystem("mkdir -p " + dirPath + " && mv -f " + targetDirectory.getAbsolutePath() + "/* " + dirPath + " && echo Archiving ex-Target photos was a success. || echo Error: Archiving ex-Target photos was a failure."));
   visitorNumber = ofApp::getNewVisitorNumber();
   textVisitorNumber->setText(ofToString(visitorNumber));
   ofApp::logWithTimestamp(" ---------------------------------------> " + ofToString(visitorNumber, 3, '0'));
@@ -546,5 +547,5 @@ void ofApp::say(string msg)
 
 void ofApp::logWithTimestamp(string msg)
 {
-  ofLog() << ofGetTimestampString("%H:%M:%D") << " " << msg;
+  ofLog() << ofGetTimestampString("%H:%M:%S") << " " << msg;
 }
