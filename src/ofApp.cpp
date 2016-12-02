@@ -239,6 +239,9 @@ void ofApp::keyPressed(int key)
     case 'e':
       ofApp::exportStart();
       break;
+    case 'u':
+      uploadAll();
+      break;
     case OF_KEY_UP:
       chromaKey.threshold += 0.005;
       break;

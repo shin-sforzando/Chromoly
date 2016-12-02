@@ -138,6 +138,8 @@ done
     - **R**e**L**oad **T**arget images
 - e
     - **E**xport synthesized images
+- u
+    - **U**pload all files to AWS S3
 
 ### Option
 * You can change preview framerate
