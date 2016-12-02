@@ -13,9 +13,19 @@ void ofApp::setup()
 
   if (settings.loadFile(SETTINGS_XML)) {
     ofApp::logWithTimestamp("SETTING_XML has been loaded.");
+    previewFramerate    = settings.getValue("previewFramerate", previewFramerate);
+    chromaKey.keyColor  = ofColor::fromHex(settings.getValue("keyColor", 0x00ff00));
+    chromaKey.threshold = settings.getValue("threshold", 0.1);
+    webCaptureFrame     = settings.getValue("webCaptureFrame", webCaptureFrame);
+    webOverlayScale     = settings.getValue("webOverlayScale", webOverlayScale);
+    webOverlayX         = settings.getValue("webOverlayX", webOverlayX);
+    webOverlayY         = settings.getValue("webOverlayY", webOverlayY);
+    snsOverlayScale     = settings.getValue("snsOverlayScale", snsOverlayScale);
+    snsOverlayX         = settings.getValue("snsOverlayX", snsOverlayX);
+    snsOverlayY         = settings.getValue("snsOverlayY", snsOverlayY);
   } else {
     ofApp::logWithTimestamp("SETTING_XML couldn't been loaded.");
-    // chromaKey.keyColor  = ofColor::fromHex(0x00FF00);  // XXX: It's not reflect in label.
+    chromaKey.keyColor  = ofColor::green;
     chromaKey.threshold = 0.1;
   }
 
@@ -37,8 +47,8 @@ void ofApp::setup()
   sliderCurrentFrame->bind(currentFrame);
   folderChromakey = gui->addFolder("Chroma Key");
   colorPicker     = folderChromakey->addColorPicker(" - Key Color");
-  colorPicker->setColor(chromaKey.keyColor);
   colorPicker->onColorPickerEvent(this, &ofApp::onColorPickerEvent);
+  colorPicker->setColor(chromaKey.keyColor);
   sliderThreshold = folderChromakey->addSlider(" - Threshold", 0, 1.0, chromaKey.threshold);
   sliderThreshold->setPrecision(3);
   sliderThreshold->bind(chromaKey.threshold);
@@ -293,7 +303,17 @@ void ofApp::gotMessage(ofMessage msg)
 
 void ofApp::exit()
 {
-  // TODO: exporting SETTINGS_XML.
+  settings.setValue("previewFramerate", previewFramerate);
+  settings.setValue("keyColor", chromaKey.keyColor.getHex());
+  settings.setValue("threshold", chromaKey.threshold);
+  settings.setValue("webCaptureFrame", webCaptureFrame);
+  settings.setValue("webOverlayScale", webOverlayScale);
+  settings.setValue("webOverlayX", webOverlayX);
+  settings.setValue("webOverlayY", webOverlayY);
+  settings.setValue("snsOverlayScale", snsOverlayScale);
+  settings.setValue("snsOverlayX", snsOverlayX);
+  settings.setValue("snsOverlayY", snsOverlayY);
+  settings.saveFile();
 }
 
 void ofApp::onTextVisitorNumberEvent(ofxDatGuiTextInputEvent e)
@@ -369,8 +389,8 @@ void ofApp::importTargets()
     cropped.cropFrom(importing, (importing.getWidth() - TARGET_WIDTH) / 2, (importing.getHeight() - TARGET_HEIGHT) / 2, TARGET_WIDTH, TARGET_HEIGHT);
     targetImages.insert(targetImages.begin(), cropped);
   }
-  chromaKey.keyColor = targetImages[0].getColor(0, 0);
-  colorPicker->setColor(chromaKey.keyColor);
+  // chromaKey.keyColor = targetImages[0].getColor(0, 0);
+  // colorPicker->setColor(chromaKey.keyColor);
   sliderCurrentFrame->setMax(targetImages.size() - 1);
   sliderWebCaptureFrame->setMax(targetImages.size() - 1);
   isTargetLoaded = true;
@@ -516,6 +536,11 @@ void ofApp::prepareNext()
 int ofApp::getNewVisitorNumber()
 {
   ofDirectory todayDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/export/" + ofGetTimestampString("%Y%m%d"));
+  if (!todayDirectory.exists()) {
+    visitorNumber = 1;
+
+    return visitorNumber;
+  }
   todayDirectory.listDir();
   int exVisitorNumber = 0;
   for (ofFile f : todayDirectory.getFiles()) {
