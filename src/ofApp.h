@@ -132,6 +132,7 @@ public:
   ofxDatGuiSlider *sliderSnsOverlayScale;
   ofxDatGui2dPad *padSnsPosition;
   ofxDatGuiButton *buttonExport;
+  ofxDatGuiToggle *toggleWithUpload;
   ofxDatGuiButton *buttonUpload;
   ofxDatGuiButton *buttonPrintQR;
 

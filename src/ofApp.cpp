@@ -73,6 +73,9 @@ void ofApp::setup()
   buttonExport = gui->addButton("Export");
   buttonExport->onButtonEvent(this, &ofApp::onButtonExportEvent);
   buttonExport->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+  toggleWithUpload = gui->addToggle(" - with Uploading");
+  toggleWithUpload->setChecked(true);
+  toggleWithUpload->setLabelAlignment(ofxDatGuiAlignment::RIGHT);
   gui->addBreak()->setHeight(10.0f);
   buttonUpload = gui->addButton("Upload All");
   buttonUpload->onButtonEvent(this, &ofApp::onButtonUploadEvent);
@@ -479,7 +482,9 @@ void ofApp::exportFinish()
 
   ofApp::convertSnsMovie();
   ofApp::convertAndroidMovie();
-  ofApp::uploadAll();
+  if (toggleWithUpload->getChecked()) {
+    ofApp::uploadAll();
+  }
   ofApp::printQRcode();
   ofApp::prepareNext();
 }

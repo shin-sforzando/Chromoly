@@ -1,10 +1,10 @@
 <previewFramerate>10</previewFramerate>
 <keyColor>65280</keyColor>
-<threshold>0.100000000</threshold>
+<threshold>0.100000001</threshold>
 <webCaptureFrame>0</webCaptureFrame>
 <webOverlayScale>0.500000000</webOverlayScale>
 <webOverlayX>320</webOverlayX>
 <webOverlayY>320</webOverlayY>
-<snsOverlayScale>0.350000000</snsOverlayScale>
+<snsOverlayScale>0.349999994</snsOverlayScale>
 <snsOverlayX>320</snsOverlayX>
 <snsOverlayY>320</snsOverlayY>
