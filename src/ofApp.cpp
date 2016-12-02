@@ -15,7 +15,7 @@ void ofApp::setup()
     ofApp::logWithTimestamp("SETTING_XML has been loaded.");
   } else {
     ofApp::logWithTimestamp("SETTING_XML couldn't been loaded.");
-    chromaKey.keyColor  = ofColor::fromHex(0x00FF00);  // XXX: It's not reflect in label.
+    // chromaKey.keyColor  = ofColor::fromHex(0x00FF00);  // XXX: It's not reflect in label.
     chromaKey.threshold = 0.1;
   }
 
@@ -395,7 +395,7 @@ void ofApp::importSnsBackgrounds()
   //   importing.load(f.getAbsolutePath());
   //   snsBackgroundImages.push_back(importing);
   // }
-  snsBackgroundImage.load(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_sns/sns.jpg");
+  snsBackgroundImage.load(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/background_sns/sns.bmp");
   isSnsBackgroundLoaded = true;
 }
 
@@ -419,6 +419,7 @@ void ofApp::exportStart()
   if (isTargetLoaded) {
     isExporting  = true;
     currentFrame = 0;
+    ofApp::say("Images loading has started.");
     sliderCurrentFrame->setBackgroundColor(ofColor(255, 0, 0));
     sliderCurrentFrame->setLabel("Exporting...");
     ofApp::exportForWeb();
@@ -429,7 +430,7 @@ void ofApp::exportForWeb()
 {
   fbo_web.readToPixels(pixels);
   exportWebImage.setFromPixels(pixels);
-  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/white.png", OF_IMAGE_QUALITY_BEST);
+  exportWebImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/main.png", OF_IMAGE_QUALITY_BEST);
 }
 
 void ofApp::exportForSns()
@@ -437,7 +438,7 @@ void ofApp::exportForSns()
   fbo_sns.readToPixels(pixels);
   exportSnsImage.setFromPixels(pixels);
   if (currentFrame == 0) {
-    exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/main.png", OF_IMAGE_QUALITY_BEST);
+    exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/white.png", OF_IMAGE_QUALITY_BEST);
   }
   exportSnsImage.save(exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/sns_" + ofToString(currentFrame, 3, '0') + ".png", OF_IMAGE_QUALITY_BEST);
 }
@@ -483,7 +484,7 @@ void ofApp::uploadAll()
   ofApp::logWithTimestamp(ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/android_*.png" +
                                    " && echo Deleting temporary Android PNG files was a success. || echo Error: Deleting temporary Android PNG files was a failure."));
   ofApp::logWithTimestamp(ofSystem("rm -f " + exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName() + "/sns_*.png" +
-                                   " && echo Deleting temporary SNS PNG files was a sucess. || echo Error: Deleting temporary SNS PNG files was a failure."));
+                                   " && echo Deleting temporary SNS PNG files was a success. || echo Error: Deleting temporary SNS PNG files was a failure."));
   ofApp::logWithTimestamp(ofSystem("/usr/local/bin/s3cmd sync --force --recursive --acl-public --no-guess-mime-type --no-check-md5 --exclude='.DS_Store' " + exportDirectory.getAbsolutePath() + "/ s3://data.nina-xmas.com/" +
                                    " && echo S3cmd syncing was a success. || echo Error: S3cmd syncing was a failure."));
   ofApp::say("Movies uploading is completed.");
