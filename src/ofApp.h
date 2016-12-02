@@ -96,7 +96,7 @@ public:
   float webOverlayScale = 0.5;
   int webOverlayX       = WEB_WIDTH / 2;
   int webOverlayY       = WEB_HEIGHT / 2;
-  float snsOverlayScale = 0.4;
+  float snsOverlayScale = 0.35;
   int snsOverlayX       = SNS_WIDTH / 2;
   int snsOverlayY       = SNS_HEIGHT / 2;
 

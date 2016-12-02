@@ -16,22 +16,23 @@ Table of Contents
 
 - [Requirements](#requirements)
 - [How to Setup](#how-to-setup)
+	- [0. Directory Structure](#0-directory-structure)
 	- [1. openFrameworks](#1-openframeworks)
-	- [2. Automator](#2-automator)
-		- [2.1 Pre process](#21-pre-process)
-			- [2.1.1 Resize](#211-resize)
-		- [2.2 Post process](#22-post-process)
-			- [2.2.1 Convert to mp4](#221-convert-to-mp4)
-			- [2.2.2 Upload to AWS S3](#222-upload-to-aws-s3)
-			- [2.2.3 Print QR code](#223-print-qr-code)
-	- [3. Camera Utility (Canon)](#3-camera-utility-canon)
-		- [3.1 Resolution](#31-resolution)
-		- [3.2 Export setting](#32-export-setting)
-		- [3.3 Shooting](#33-shooting)
+	- [2. Camera Utility (Canon)](#2-camera-utility-canon)
+		- [2.1 Resolution](#21-resolution)
+		- [2.2 Export setting](#22-export-setting)
+		- [2.3 Shooting](#23-shooting)
+	- [3. S3cmd](#3-s3cmd)
+	- [4. Printer](#4-printer)
 - [How to Use](#how-to-use)
-  - [Keyboard shortcut](#keyboard-shortcut)
-  - [Option](#option)
+	- [Misc. 1: Annotate text on images using ImageMagick](#misc-1-annotate-text-on-images-using-imagemagick)
+	- [Misc. 2: Flip all images using ImageMagick](#misc-2-flip-all-images-using-imagemagick)
+	- [Misc. 3: Resize all images using ImageMagick](#misc-3-resize-all-images-using-imagemagick)
+	- [Misc. 4: Convert mp4 using FFmpeg](#misc-4-convert-mp4-using-ffmpeg)
+	- [Keyboard shortcut](#keyboard-shortcut)
+	- [Option](#option)
 - [Contributes](#contributes)
+- [LICENSE](#license)
 
 ## Requirements
 - Mac OS 10.11 or higher
@@ -44,44 +45,56 @@ Table of Contents
     - [QREncode](http://fukuchi.org/works/qrencode/)
 
 ## How to Setup
+### 0. Directory Structure
+    ~/Desktop
+    ├── background_android
+    ├── background_original
+    ├── background_sns
+    ├── background_web
+    ├── backup_import
+    ├── export
+    ├── import
+    └── of_v0.9.8_osx_release
+        ├── addons
+        │   ├── ofxChromaKey
+        │   ├── ofxDatGui
+        │   └── ofxXmlSettings
+        │       ├── libs
+        │       └── src
+        └── apps
+            └── myApps
+                └── Chromoly
+
 ### 1. openFrameworks
 1. Download openFrameworks latest osx release version.
 1. Change direcotory to `myApps` and clone this repository.
 1. Add `+x` to `setup.sh` and execute it.
-1. It will install some addons to appropriate path.
+    1. It will install some addons to appropriate path.
 
-### 2. Automator
+1. Prepare background images to appropriate path.
 
-#### 2.1 Pre process
+### 2. Camera Utility (Canon)
 
-##### 2.1.1 Resize
+#### 2.1 Resolution
+* It doesn't need RAW files
+* Set "S2" to approx 2K x 2K
 
-#### 2.2 Post process
+#### 2.2 Export setting
+* Set import direcotory correctry like "import"
+* Set rename setting to "<Shooting Time>|<Image Number>" like 1742480001.jpg
 
-##### 2.2.1 Convert to mp4
-`ffmpeg -r 10 -i android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" android_yuv420p.mp4`
+#### 2.3 Shooting
+* Take continuous photos more than final movie rate
 
-##### 2.2.2 Upload to AWS S3
+### 3. S3cmd
+`s3cmd --configure`
 
-##### 2.2.3 Print QR code
+### 4. Printer
 `lpr -P Brother_QL-700 -o media=DC17 ~.png`
 
 - DC17 = 39x48mm
 - DC03 = 29x90mm
 - DC08 = 29x42mm
-
-### 3. Camera Utility (Canon)
-
-#### 3.1 Resolution
-* It doesn't need RAW files
-* Set "S2" to approx 2K x 2K
-
-#### 3.2 Export setting
-* Set import direcotory correctry like "import"
-* Set rename setting to "<Shooting Time>|<Image Number>" like 1742480001.jpg
-
-#### 3.3 Shooting
-* Take continuous photos more than final movie rate
 
 ## How to Use
 
@@ -109,10 +122,13 @@ done
 ```
 
 ### Misc. 2: Flip all images using ImageMagick
-```mogrify -resize 1920x *.JPG```
+`mogrify -resize 1920x *.JPG`
 
 ### Misc. 3: Resize all images using ImageMagick
-```mogrify -flip *.jpg```
+`mogrify -flip *.jpg`
+
+### Misc. 4: Convert mp4 using FFmpeg
+`ffmpeg -r 10 -i android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" android_yuv420p.mp4`
 
 ### Keyboard shortcut
 
@@ -129,4 +145,7 @@ done
     * If it was set '0', Chromoly will try to render as quick as possible
 
 ## Contributes
-- Shin'ichiro SUZUKI (CEO / [szk-engineering](https://szk-engineering.com/))
+- Shin'ichiro SUZUKI (C"E"O / [szk-engineering](https://szk-engineering.com/))
+
+## LICENSE
+WTFPL
