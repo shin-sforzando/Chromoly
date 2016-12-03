@@ -168,7 +168,7 @@ void ofApp::update()
     flipped.clone(targetImages[currentFrame]);
     flipped.mirror(true, false);
     chromaKey.begin();
-    flipped.draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 + 93);
+    flipped.draw(ANDROID_WIDTH / 2 - TARGET_WIDTH / 2, 651 + 93, TARGET_WIDTH, TARGET_HEIGHT);
     chromaKey.end();
   }
 
@@ -392,7 +392,7 @@ void ofApp::importTargets()
     ofImage importing;
     ofImage cropped;
     importing.load(reversed[i].getAbsolutePath());
-    cropped.cropFrom(importing, (importing.getWidth() - TARGET_WIDTH) / 2, (importing.getHeight() - TARGET_HEIGHT) / 2, TARGET_WIDTH, TARGET_HEIGHT);
+    cropped.cropFrom(importing, (importing.getWidth() - TARGET_WIDTH) / 2, (importing.getHeight() - TARGET_HEIGHT) / 2, CROP_WIDTH, CROP_HEIGHT);
     targetImages.insert(targetImages.begin(), cropped);
   }
   // chromaKey.keyColor = targetImages[0].getColor(0, 0);
