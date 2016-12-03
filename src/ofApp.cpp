@@ -445,7 +445,7 @@ void ofApp::exportStart()
   if (isTargetLoaded) {
     isExporting  = true;
     currentFrame = 0;
-    ofApp::say("Images loading has started.");
+    ofApp::say("Images exporting has started.");
     sliderCurrentFrame->setBackgroundColor(ofColor(255, 0, 0));
     sliderCurrentFrame->setLabel("Exporting...");
     ofApp::exportForWeb();
