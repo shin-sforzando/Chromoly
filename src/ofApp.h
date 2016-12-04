@@ -6,7 +6,7 @@
 #include "ofxDatGuiCustomFontSize.h"
 #include "ofxXmlSettings.h"
 
-#define FRAME_NUM      36
+#define FRAME_NUM      28
 #define TARGET_WIDTH   640
 #define TARGET_HEIGHT  640
 #define CROP_WIDTH     950
