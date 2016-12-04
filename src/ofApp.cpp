@@ -540,7 +540,7 @@ void ofApp::printNicoleQRcode()
     string url        = "http://nina-xmas.com/share.php?d=nicole&n=" + ofToString(1 + 6 * v, 3, '0');
     string exportPath = exportDirectory.getAbsolutePath() + "/nicole";
     ofApp::logWithTimestamp(ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"" + " && echo Making QR code image was a success. || echo Error: Making QR code image was a failure."));
-    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'for Nicole\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(1 + v) + "' " + exportPath + "/url.png" +
+    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(1 + v) + "' " + exportPath + "/url.png" +
                                      " && echo Making URL image was a success. || echo Error: Making URL image was a failure."));
     ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png" +
                                      " && echo Composing QR code was a success. || echo Error: Composing QR code was a failure."));
