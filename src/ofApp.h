@@ -63,6 +63,7 @@ public:
   void convertAndroidMovie();
   void uploadAll();
   void printQRcode();
+  void printNicoleQRcode();
   void prepareNext();
 
   // Utility

@@ -242,6 +242,9 @@ void ofApp::keyPressed(int key)
     case 'u':
       uploadAll();
       break;
+    case 'n':
+      printNicoleQRcode();
+      break;
     case OF_KEY_UP:
       chromaKey.threshold += 0.005;
       break;
@@ -495,14 +498,14 @@ void ofApp::exportFinish()
 void ofApp::convertSnsMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r 10 -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/main.mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r " + ofToString(previewFramerate) + " -i " + path + "/sns_%03d.png -pix_fmt yuv420p " + path + "/main.mp4" +
                                    " && echo Converting SNS mp4 was a success. || echo Error: Converting SNS mp4 was a failure."));
 }
 
 void ofApp::convertAndroidMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r 10 -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r "+ofToString(previewFramerate)+" -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
                                    " && echo Converting Android mp4 was a success. || echo Error: Converting Android mp4 was a failure."));
 }
 
@@ -528,6 +531,21 @@ void ofApp::printQRcode()
   ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png" +
                                    " && echo Composing QR code was a success. || echo Error: Composing QR code was a failure."));
   ofApp::logWithTimestamp(ofSystem("lpr -P Brother_QL_700 -o PageSize=DC17 -o media=DC17 " + exportPath + "/qr.png" + " && echo QR code printing was a success. || echo Error: QR code printing was a failure."));
+  ofApp::say("QR code printing is completed.");
+}
+
+void ofApp::printNicoleQRcode()
+{
+  for (int v = 0; v < 5; v++) {
+    string url        = "http://nina-xmas.com/share.php?d=nicole&n=" + ofToString(1 + 6 * v, 3, '0');
+    string exportPath = exportDirectory.getAbsolutePath() + "/nicole";
+    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"" + " && echo Making QR code image was a success. || echo Error: Making QR code image was a failure."));
+    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(1 + 6 * v, 3, '0') + "' " + exportPath + "/url.png" +
+                                     " && echo Making URL image was a success. || echo Error: Making URL image was a failure."));
+    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png" +
+                                     " && echo Composing QR code was a success. || echo Error: Composing QR code was a failure."));
+    ofApp::logWithTimestamp(ofSystem("lpr -P Brother_QL_700 -o PageSize=DC17 -o media=DC17 " + exportPath + "/qr.png" + " && echo QR code printing was a success. || echo Error: QR code printing was a failure."));
+  }
   ofApp::say("QR code printing is completed.");
 }
 
