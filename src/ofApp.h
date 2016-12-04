@@ -9,8 +9,6 @@
 #define FRAME_NUM      28
 #define TARGET_WIDTH   640
 #define TARGET_HEIGHT  640
-#define CROP_WIDTH     950
-#define CROP_HEIGHT    950
 #define ANDROID_WIDTH  1440
 #define ANDROID_HEIGHT 1395
 #define SNS_WIDTH      640
@@ -63,7 +61,7 @@ public:
   void convertAndroidMovie();
   void uploadAll();
   void printQRcode();
-  void printNicoleQRcode();
+  void printLastQRcode();
   void prepareNext();
 
   // Utility
@@ -103,6 +101,7 @@ public:
   float snsOverlayScale = 0.35;
   int snsOverlayX       = SNS_WIDTH / 2;
   int snsOverlayY       = SNS_HEIGHT / 2;
+  int cropSize          = 950;
 
   // Images
   vector <ofImage> targetImages;
@@ -136,7 +135,7 @@ public:
   ofxDatGuiSlider *sliderSnsOverlayScale;
   ofxDatGui2dPad *padSnsPosition;
   ofxDatGuiButton *buttonExport;
-  ofxDatGuiToggle *toggleWithUpload;
+  ofxDatGuiSlider *sliderCropSize;
   ofxDatGuiButton *buttonUpload;
   ofxDatGuiButton *buttonPrintQR;
 
