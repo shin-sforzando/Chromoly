@@ -288,7 +288,7 @@ void ofApp::mouseReleased(int x, int y, int button)
       // Inside RAW Area
       int actualX = x * (1.0 * desirableWidth / ofGetWidth());
       int actualY = y * (1.0 * desirableHeight / ofGetHeight());
-      chromaKey.keyColor = targetImages[webCaptureFrame].getColor(actualX, actualY);
+      chromaKey.keyColor = targetImages[webCaptureFrame].getColor(actualX * (CROP_WIDTH / TARGET_WIDTH), actualY * (CROP_HEIGHT / TARGET_HEIGHT));
       colorPicker->setColor(chromaKey.keyColor);
     }
   }
@@ -505,7 +505,7 @@ void ofApp::convertSnsMovie()
 void ofApp::convertAndroidMovie()
 {
   string path = exportDirectory.getAbsolutePath() + "/" + ofApp::getExportName();
-  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r "+ofToString(previewFramerate)+" -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
+  ofApp::logWithTimestamp(ofSystem("/usr/local/bin/ffmpeg -y -r " + ofToString(previewFramerate) + " -i " + path + "/android_%03d.png -c:v libx264 -pix_fmt yuv420p -vf scale=1440:1396 " + path + "/movie.mp4" +
                                    " && echo Converting Android mp4 was a success. || echo Error: Converting Android mp4 was a failure."));
 }
 
@@ -540,7 +540,7 @@ void ofApp::printNicoleQRcode()
     string url        = "http://nina-xmas.com/share.php?d=nicole&n=" + ofToString(1 + 6 * v, 3, '0');
     string exportPath = exportDirectory.getAbsolutePath() + "/nicole";
     ofApp::logWithTimestamp(ofSystem("/usr/local/bin/qrencode -o " + exportPath + "/qr.png -l M \"" + url + "\"" + " && echo Making QR code image was a success. || echo Error: Making QR code image was a failure."));
-    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'http://nina-xmas.com/\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(1 + 6 * v, 3, '0') + "' " + exportPath + "/url.png" +
+    ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -font TimesNewRomanI -pointsize 24 label:'for Nicole\n" + ofGetTimestampString("%e %b. %Y") + "  #" + ofToString(1 + v) + "' " + exportPath + "/url.png" +
                                      " && echo Making URL image was a success. || echo Error: Making URL image was a failure."));
     ofApp::logWithTimestamp(ofSystem("/usr/local/bin/convert -gravity center -append " + exportPath + "/qr.png " + exportPath + "/url.png " + exportPath + "/qr.png" +
                                      " && echo Composing QR code was a success. || echo Error: Composing QR code was a failure."));
