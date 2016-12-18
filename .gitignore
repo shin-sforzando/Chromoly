@@ -155,4 +155,4 @@ Desktop.ini
 
 .mailmap
 /apps*/
-settings.xml
+bin/data/settings.xml
