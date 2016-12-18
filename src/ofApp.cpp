@@ -5,7 +5,7 @@ ofDirectory exportDirectory(ofFilePath::getUserHomeDir() + "/Desktop/NinaRicci/e
 
 void ofApp::setup()
 {
-  ofSetWindowTitle("Chromoly (NINA RICCI 2016 Version)");
+  ofSetWindowTitle("Chromoly (NINA RICCI 2016 Version 20161218)");
   ofSetVerticalSync(true);
   ofEnableAlphaBlending();
   ofSetFrameRate(previewFramerate);
@@ -391,9 +391,12 @@ void ofApp::importTargets()
 
     return;
   }
+  isTargetLoaded = false;
   targetImages.clear();
   reverse(reversed.begin(), reversed.end());
   for (int i = 0; i < FRAME_NUM; i++) {
+    logWithTimestamp("Loading image #" + ofToString(i, 2, '0') + ": " + reversed[i].getAbsolutePath());  // Just Debug!!
+
     ofImage importing;
     ofImage cropped;
     importing.load(reversed[i].getAbsolutePath());
